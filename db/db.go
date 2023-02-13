@@ -10,10 +10,10 @@ import (
 
 const (
 	host     = "localhost"
-	port     = 5433
+	port     = 5432
 	user     = "postgres"
-	password = "katasandi12"
-	dbname   = "golangdev"
+	password = "P@SS1234"
+	dbname   = "teller"
 )
 
 var (

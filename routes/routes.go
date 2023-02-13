@@ -12,10 +12,14 @@ func Routes() {
 	r.POST("/postcustomer", controllers.PostCustomer)
 	r.POST("/postitem", controllers.PostItem)
 	r.POST("/postorder", controllers.PostOrder)
+	
+	r.POST("/teller/hostinq", controllers.HostInquiry)
 
 	r.GET("/getorder/:orderNo", controllers.GetOrder)
 
 	r.PUT("/updateorder/:orderNo", controllers.UpdateOrder)
+
+
 
 	r.Run(":5000")
 }
