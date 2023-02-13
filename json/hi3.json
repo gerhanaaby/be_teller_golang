@@ -1,0 +1,12 @@
+{
+  "CreditProductCode": "00",
+  "CreditProductDescription": "TabSmPayroll ",
+  "CreditReservedAlphaField1": "000000000000000000000000000000",
+  "CreditReservedAlphaField2": "000000000000000000000000000000",
+  "CreditReservedFillerField": "YND ",
+  "CreditReservedNumericField1": "00000000000000000",
+  "CreditReservedNumericField2": "00000000000000000",
+  "CreditReturnCode": "00",
+  "DebitAccountType": " ",
+  "DebitAvailableBalance": " . "
+}
