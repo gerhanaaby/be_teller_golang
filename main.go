@@ -12,6 +12,7 @@ func init() {
 }
 
 func main() {
+<<<<<<< Updated upstream
 
 	r := gin.Default()
 
@@ -24,4 +25,7 @@ func main() {
 	r.PUT("/updateorder/:orderNo", controllers.UpdateOrder)
 
 	r.Run(":5000")
+=======
+	routes.Routes()
+>>>>>>> Stashed changes
 }
