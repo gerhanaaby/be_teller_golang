@@ -10,6 +10,7 @@ func init() {
 }
 
 func main() {
+
 	routes.Routes()
-	
+
 }
