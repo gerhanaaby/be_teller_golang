@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"fmt"
-	"golang/db"
-	"golang/models"
 	"net/http"
+	"teller/db"
+	"teller/models"
 
 	"github.com/gin-gonic/gin"
 )
