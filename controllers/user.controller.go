@@ -55,8 +55,6 @@ func UserLoginController(c *gin.Context) {
 		Username: request.Username,
 		Token: LoginToken,
 	})
-
-	return
 	// http.SetCookie(w, &http.Cookie{
 	// 	Name:    "token",
 	// 	Value:   tokenString,
