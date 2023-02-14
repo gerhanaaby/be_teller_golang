@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"golang/db"
-	"golang/models"
 	"math/rand"
 	"net/http"
 	"strconv"
+	"teller/db"
+	"teller/models"
 
 	"github.com/gin-gonic/gin"
 )

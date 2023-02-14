@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"golang/models"
+	"teller/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
