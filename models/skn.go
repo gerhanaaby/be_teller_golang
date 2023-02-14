@@ -6,7 +6,6 @@ type Skn struct {
 	gorm.Model
 
 	ID                        uint   `json:"id"`
-	SknId                     string `json:"SknId" gorm:"type:varchar(7)"`
 	CreditAccountNo           string `json:"creditAccountNo" gorm:"type:varchar(50)"`
 	Amount                    string `json:"amount" gorm:"type:varchar(250)"`
 	BeneficiaryResidentStatus string `json:"beneficiaryResidentStatus" gorm:"type:varchar(5)"`

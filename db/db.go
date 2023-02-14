@@ -10,10 +10,11 @@ import (
 
 const (
 	host     = "localhost"
-	port     = 5432
+	port     = 5433
 	user     = "postgres"
-	password = "P@SS1234"
-	dbname   = "teller"
+	password = "katasandi12"
+	//password = "P@SS1234"
+	dbname = "teller"
 )
 
 var (
@@ -27,7 +28,7 @@ func ConnectDB() {
 	if err != nil {
 		panic(err)
 	}
-	db.Debug().AutoMigrate(&models.Customer{}, &models.Order{}, &models.Item{})
+	db.Debug().AutoMigrate(&models.Customer{}, &models.Order{}, &models.Item{}, &models.Skn{})
 }
 func GetDB() *gorm.DB {
 	return db
