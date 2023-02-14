@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"golang/controllers"
+	"teller/controllers"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +19,10 @@ func Routes() {
 
 	r.PUT("/updateorder/:orderNo", controllers.UpdateOrder)
 
+	// r.POST("/user/auth/register")
 
+	r.POST("/user/auth/login", controllers.UserLogin)
+	// r.POST("/user/auth/verify", controllers.UserLoginVerify)
 
 	r.Run(":5000")
 }
