@@ -88,14 +88,9 @@ func UserLogin(c *gin.Context) {
 		})
 }
 
-func UserLoginVerify(c *gin.Context) (bool, error) {
-
-	reqToken := c.Request.Header.Get("Authorization")
+func ValidateToken(reqToken string) (bool, error) {
 	if reqToken == ""{
-		c.AbortWithError(http.StatusInternalServerError, errors.New("error, empty token"))
-		c.JSON(http.StatusBadRequest, AuthStatus{
-		Status: "Fail", 
-		Message: "error, empty token"})
+		return false, errors.New("empty token")
 	}
 	
 	token := strings.Replace(reqToken, "Bearer ", "", 1)
@@ -112,7 +107,7 @@ func UserLoginVerify(c *gin.Context) (bool, error) {
 		return false, err
 	}
 	if !tkn.Valid {
-		return false, err
+		return false, errors.New("invalid token")
 	}
 
 	return true, nil
