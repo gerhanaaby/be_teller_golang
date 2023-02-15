@@ -9,15 +9,18 @@ import (
 
 func init() {
 
-	if err := godotenv.Load(`/home/golang/app/teller/env`); err != nil {
-		return
+	//   /home/golang/app/teller/env
+	if err := godotenv.Load(".env"); err != nil {
+		panic(err)
 	}
 
-	db.ConnectDB()
+	if err := db.ConnectDB(); err != nil{
+		panic(err)
+	}
 }
 
 
 func main() {
-	
+	// Init()
 	routes.Routes()	
 }

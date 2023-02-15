@@ -56,7 +56,7 @@ func UserLoginController(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status: "Fail", 
-			Message: "unable to login due error getting token",
+			Message: "unable to login due error getting token"+err.Error(),
 		})
 		return 
 	}
@@ -78,12 +78,9 @@ func Login(user models.SignInInput) (string, error){
 	result := models.User{}
 	username := user.Username
 	password := user.Password
-	fmt.Println("Username ----> "+username)
 
-
-	// fmt.Println("Username ----> "+user.Username)
-	if err := db.PSQLDB.Debug().Where("username = ? AND password = ? AND verified = true", username, password).Find(&result).Error;err != nil {
-		fmt.Println(err)
+	err := db.GetDB().Where("username = ? AND password = ? AND verified = true", username, password).Find(&result).Error
+	if err != nil {
 		return ``, err
 	}
 
@@ -92,7 +89,7 @@ func Login(user models.SignInInput) (string, error){
 	expirationTime := time.Now().Add(5 * time.Minute)
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &Claims{
-		Username: username,
+		Username: user.Username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			// In JWT, the expiry time is expressed as unix milliseconds
 			ExpiresAt: jwt.NewNumericDate(expirationTime),

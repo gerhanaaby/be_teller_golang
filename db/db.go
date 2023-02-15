@@ -10,26 +10,25 @@ import (
 )
 
 var (
-	DB  *gorm.DB
+	db  *gorm.DB
 	err error	
 )
 
-var PSQLDB *gorm.DB
-
-func ConnectDB() {
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", 
+func ConnectDB()  error {
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", 
 	os.Getenv(`PSQL_HOST`),
-			os.Getenv(`PSQL_PORT`),
+			5432,
 			os.Getenv(`PSQL_USER`),
 			os.Getenv(`PSQL_PASS`),
 			os.Getenv(`PSQL_DBNAME`))
-	DB, err = gorm.Open(postgres.Open(psqlInfo), &gorm.Config{})
+	fmt.Println(`PSQL---------------->`+psqlInfo)
+	db, err = gorm.Open(postgres.Open(psqlInfo), &gorm.Config{})
 	if err != nil {
-		panic(err)
+		return err
 	}
-	PSQLDB = DB
-	DB.AutoMigrate(&models.User{}, &models.Skn{})
+	db.AutoMigrate(&models.User{}, &models.Skn{})
+	return nil
 }
 func GetDB() *gorm.DB {
-	return DB
+	return db
 }
