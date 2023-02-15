@@ -30,7 +30,14 @@ var SecretKey = []byte("KMZWA87AWAA")
 func UserLoginController(c *gin.Context) {
 	request := models.SignInInput{}
 
-	fmt.Println("Username ----> "+request.Username)
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status: "Fail", 
+			Message: "unable to login due error",
+		})
+		return
+	}
 
 	if request.Username == `` || request.Password == `` {
 		c.AbortWithError(http.StatusBadRequest, errors.New("empy username or password"))
@@ -41,15 +48,8 @@ func UserLoginController(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
-			Message: "unable to login due wrong username or password",
-		})
-		return
-	}
-	
+	fmt.Println("Username ----> "+request.Username)
+
 	LoginToken, err := Login(request)
 
 	if LoginToken == `` || err != nil{
@@ -78,9 +78,12 @@ func Login(user models.SignInInput) (string, error){
 	result := models.User{}
 	username := user.Username
 	password := user.Password
+	fmt.Println("Username ----> "+username)
 
-	err := db.GetDB().Where("username = ? AND password = ? AND verified = true", username, password).Find(&result).Error
-	if err != nil {
+
+	// fmt.Println("Username ----> "+user.Username)
+	if err := db.PSQLDB.Debug().Where("username = ? AND password = ? AND verified = true", username, password).Find(&result).Error;err != nil {
+		fmt.Println(err)
 		return ``, err
 	}
 
@@ -89,7 +92,7 @@ func Login(user models.SignInInput) (string, error){
 	expirationTime := time.Now().Add(5 * time.Minute)
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &Claims{
-		Username: user.Username,
+		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			// In JWT, the expiry time is expressed as unix milliseconds
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
