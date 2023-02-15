@@ -2,19 +2,11 @@ package db
 
 import (
 	"fmt"
+	"os"
 	"teller/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-)
-
-const (
-	host     = "localhost"
-	port     = 5433
-	user     = "postgres"
-	password = "katasandi12"
-	//password = "P@SS1234"
-	dbname = "teller"
 )
 
 var (
@@ -23,12 +15,17 @@ var (
 )
 
 func ConnectDB() {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", 
+	os.Getenv(`PSQL_HOST`),
+			os.Getenv(`PSQL_PORT`),
+			os.Getenv(`PSQL_USER`),
+			os.Getenv(`PSQL_PASS`),
+			os.Getenv(`PSQL_DBNAME`))
 	db, err = gorm.Open(postgres.Open(psqlInfo), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
-	db.Debug().AutoMigrate(&models.Customer{}, &models.Order{}, &models.Item{}, &models.Skn{})
+	db.AutoMigrate(&models.User{}, &models.Skn{})
 }
 func GetDB() *gorm.DB {
 	return db

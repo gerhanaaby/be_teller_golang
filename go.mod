@@ -8,10 +8,10 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-jwt/jwt/v4 v4.4.3
 	github.com/jackc/pgtype v1.14.0
+	github.com/joho/godotenv v1.5.1
 	github.com/k3a/html2text v1.1.0
 	github.com/spf13/viper v1.12.0
 	github.com/thanhpk/randstr v1.0.4
-	github.com/wpcodevo/golang-gorm-postgres v0.0.0-20221002140051-01396cc5d5a0
 	golang.org/x/crypto v0.4.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/postgres v1.4.7
@@ -30,6 +30,7 @@ require (
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
+	github.com/jackc/pgx/v4 v4.16.1 // indirect
 	github.com/jackc/pgx/v5 v5.2.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect

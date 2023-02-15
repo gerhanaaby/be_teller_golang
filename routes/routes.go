@@ -22,7 +22,7 @@ func Routes() {
 
 	// r.POST("/user/auth/register")
 
-	r.POST("/user/auth/login", controllers.UserLogin)
+	r.POST("/user/auth/login", controllers.UserLoginController)
 	// r.POST("/user/auth/verify", controllers.UserLoginVerify)
 
 	r.Run(":5000")

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"teller/db"
@@ -26,27 +27,52 @@ type Claims struct {
 
 var SecretKey = []byte("KMZWA87AWAA")
 
-func UserLogin(c *gin.Context) {
+func UserLoginController(c *gin.Context) {
 	var request models.SignInInput
+
+	fmt.Println("Username ----> "+request.Username)
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status: "Fail", 
+			Message: "unable to login due wrong username or password",
+		})
 		return
 	}
+	
+	LoginToken, err := Login(request)
 
-	var err error
-	result := models.User{}
-
-	username := request.Username
-	password := request.Password
-
-	err = db.GetDB().Where("username = ? AND password = ?", username, password).Find(&result).Error
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		c.JSON(http.StatusOK, AuthStatus{
+	if LoginToken == `` || err != nil{
+		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status: "Fail", 
-			Message: "wrong Username or Password"})
-		return
+			Message: "unable to login due error getting token",
+		})
+		return 
+	}
+
+	c.JSON(http.StatusOK, AuthStatus{
+		Status: "Success", 
+		Message: "Login berhasil.",
+		Username: request.Username,
+		Token: LoginToken,
+	})
+	// http.SetCookie(w, &http.Cookie{
+	// 	Name:    "token",
+	// 	Value:   tokenString,
+	// 	Expires: expirationTime,
+	// })
+}
+
+func Login(user models.SignInInput) (string, error){
+	result := models.User{}
+	username := user.Username
+	password := user.Password
+
+	err := db.GetDB().Where("username = ? AND password = ? AND verified = true", username, password).Find(&result).Error
+	if err != nil {
+		return ``, err
 	}
 
 	// Declare the expiration time of the token
@@ -54,7 +80,7 @@ func UserLogin(c *gin.Context) {
 	expirationTime := time.Now().Add(5 * time.Minute)
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &Claims{
-		Username: request.Username,
+		Username: user.Username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			// In JWT, the expiry time is expressed as unix milliseconds
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
@@ -67,25 +93,10 @@ func UserLogin(c *gin.Context) {
 	tokenString, err := token.SignedString(SecretKey)
 	if err != nil {
 		// If there is an error in creating the JWT return an internal server error
-		c.AbortWithError(http.StatusInternalServerError, err)
-		c.JSON(http.StatusOK, AuthStatus{
-			Status: "Fail", 
-			Message: err.Error()})
-		return
+		return  ``, err
 	}
 
-	// http.SetCookie(w, &http.Cookie{
-	// 	Name:    "token",
-	// 	Value:   tokenString,
-	// 	Expires: expirationTime,
-	// })
-
-	c.JSON(http.StatusOK, AuthStatus{
-			Status: "Success", 
-			Message: "Login berhasil.",
-			Username: request.Username,
-			Token: tokenString,
-		})
+	return tokenString, nil
 }
 
 func ValidateToken(reqToken string) (bool, error) {

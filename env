@@ -1,0 +1,27 @@
+# Postgresql 13 server 82
+PSQL_DRIVER = postgres
+PSQL_HOST = 10.22.100.82
+PSQL_PORT = 6543
+PSQL_USER = golangdev
+PSQL_PASS = simaS123
+PSQL_DBNAME = teller
+
+POSTGRES_HOST = localhost
+POSTGRES_USER = golangdev
+POSTGRES_PASSWORD = simaS123
+POSTGRES_DB = teller
+POSTGRES_PORT = 6543
+
+PORT=8000
+CLIENT_ORIGIN=http://localhost:5000
+
+EMAIL_FROM=
+SMTP_HOST=
+SMTP_USER=
+SMTP_PASS=
+SMTP_PORT=
+
+TOKEN_EXPIRED_IN=60m
+TOKEN_MAXAGE=60
+
+TOKEN_SECRET=my-ultra-secure-json-web-token-string

@@ -1,32 +1,23 @@
 package main
 
 import (
-	"log"
 	"teller/db"
-	"teller/models"
 	"teller/routes"
 
-	"github.com/wpcodevo/golang-gorm-postgres/initializers"
+	"github.com/joho/godotenv"
 )
 
 func init() {
-	config, err := initializers.LoadConfig(".")
-	if err != nil {
-		log.Fatal("? Could not load environment variables", err)
+
+	if err := godotenv.Load(`/home/golang/app/teller/env`); err != nil {
+		return
 	}
 
-	initializers.ConnectDB(&config)
-}
-
-func init() {
 	db.ConnectDB()
 }
 
+
 func main() {
-
-	initializers.DB.AutoMigrate(&models.User{})
-	initializers.DB.AutoMigrate(&models.Skn{})
-
-	routes.Routes()
-
+	
+	routes.Routes()	
 }
