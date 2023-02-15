@@ -15,9 +15,9 @@ var (
 )
 
 func ConnectDB()  error {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", 
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", 
 	os.Getenv(`PSQL_HOST`),
-			5432,
+	os.Getenv(`PSQL_PORT`),
 			os.Getenv(`PSQL_USER`),
 			os.Getenv(`PSQL_PASS`),
 			os.Getenv(`PSQL_DBNAME`))
