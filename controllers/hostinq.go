@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"golang/models"
 	"net/http"
+	"teller/models"
 
 	"github.com/gin-gonic/gin"
 )

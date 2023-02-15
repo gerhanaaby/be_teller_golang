@@ -1,16 +1,26 @@
 package main
 
 import (
-	"golang/db"
-	"golang/routes"
+	"teller/db"
+	"teller/routes"
+
+	"github.com/joho/godotenv"
 )
 
 func init() {
-	db.ConnectDB()
+
+	//   /home/golang/app/teller/env
+	if err := godotenv.Load(".env"); err != nil {
+		panic(err)
+	}
+
+	if err := db.ConnectDB(); err != nil{
+		panic(err)
+	}
 }
 
+
 func main() {
-
-	routes.Routes()
-
+	// Init()
+	routes.Routes()	
 }
