@@ -28,9 +28,18 @@ type Claims struct {
 var SecretKey = []byte("KMZWA87AWAA")
 
 func UserLoginController(c *gin.Context) {
-	var request models.SignInInput
+	request := models.SignInInput{}
 
 	fmt.Println("Username ----> "+request.Username)
+
+	if request.Username == `` || request.Password == `` {
+		c.AbortWithError(http.StatusBadRequest, errors.New("empy username or password"))
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status: "Fail", 
+			Message: "empty username or password",
+		})
+		return
+	}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)

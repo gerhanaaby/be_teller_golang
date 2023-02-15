@@ -13,7 +13,7 @@ func Routes() {
 	r.POST("/postitem", controllers.PostItem)
 	r.POST("/postorder", controllers.PostOrder)
 	r.POST("/postskn", controllers.PostSkn)
-
+	r.POST("/user/auth/login", controllers.UserLoginController)
 	r.POST("/teller/hostinq", controllers.HostInquiry)
 
 	r.GET("/getorder/:orderNo", controllers.GetOrder)
@@ -22,7 +22,6 @@ func Routes() {
 
 	// r.POST("/user/auth/register")
 
-	r.POST("/user/auth/login", controllers.UserLoginController)
 	// r.POST("/user/auth/verify", controllers.UserLoginVerify)
 
 	r.Run(":5000")
