@@ -29,8 +29,10 @@ func PostSkn(c *gin.Context) {
 
 	PostToAPIdev(request)
 
+	dataResponse := PostToAPIdev(request)
+
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "Yeay Berhasil!",
+		"message": dataResponse,
 	})
 
 }
