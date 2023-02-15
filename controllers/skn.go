@@ -27,17 +27,19 @@ func PostSkn(c *gin.Context) {
 		return
 	}
 
+	fmt.Println("===============================================")
+	fmt.Println("request", request)
+
+	fmt.Println("===============================================")
 	PostToAPIdev(request)
 
 	dataResponse := PostToAPIdev(request)
 
-	c.JSON(http.StatusCreated, gin.H{
-		"message": dataResponse,
-	})
+	c.JSON(http.StatusCreated, dataResponse)
 
 }
 
-func PostToAPIdev(dataSKN models.Skn) map[string]string {
+func PostToAPIdev(dataSKN models.Skn) map[string]interface{} {
 
 	data := map[string]interface{}{
 		"creditAccountNo":           dataSKN.CreditAccountNo,
@@ -68,7 +70,7 @@ func PostToAPIdev(dataSKN models.Skn) map[string]string {
 	client := &http.Client{}
 
 	request, err := http.NewRequest("POST", "https://apidev.banksinarmas.com/internal/transactions/transfer/v2.0/skn", bytes.NewBuffer(requestJson))
-	
+
 	request.Header.Set("Content-type", "application/json")
 	request.Header.Set("x-gateway-apikey", "97817cac-d589-4d9c-b9bf-a874f0ff943d")
 
@@ -87,7 +89,7 @@ func PostToAPIdev(dataSKN models.Skn) map[string]string {
 		log.Fatalln(err)
 	}
 
-	dataResponse := map[string]string{}
+	var dataResponse map[string]interface{}
 	err = json.Unmarshal(body, &dataResponse)
 
 	// Check your errors!
