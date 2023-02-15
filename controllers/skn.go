@@ -68,7 +68,9 @@ func PostToAPIdev(dataSKN models.Skn) map[string]string {
 	client := &http.Client{}
 
 	request, err := http.NewRequest("POST", "https://apidev.banksinarmas.com/internal/transactions/transfer/v2.0/skn", bytes.NewBuffer(requestJson))
+	
 	request.Header.Set("Content-type", "application/json")
+	request.Header.Set("x-gateway-apikey", "97817cac-d589-4d9c-b9bf-a874f0ff943d")
 
 	if err != nil {
 		log.Fatalln(err)
