@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"teller/models"
@@ -15,6 +16,9 @@ func ConsumeAPIService(name string, model []byte) ([]byte, error) {
 	}
 
 	req.Header.Set(`Content-Type`, `application/json`)
+	fmt.Println("KEY"+models.ApiMap[name].Key)
+	fmt.Println("VALUE"+models.ApiMap[name].Value)
+
 	req.Header.Set(models.ApiMap[name].Key, models.ApiMap[name].Value)
 
 	client := &http.Client{}
