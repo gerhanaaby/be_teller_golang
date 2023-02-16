@@ -3,10 +3,12 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 	"teller/db"
 	"teller/models"
 
@@ -14,14 +16,47 @@ import (
 )
 
 func PostSkn(c *gin.Context) {
+	var isValid bool
+	var err error
+	reqToken := c.Request.Header.Get("Authorization")
+	if reqToken == ""{
+		c.AbortWithError(http.StatusInternalServerError, errors.New("error, empty token"))
+		c.JSON(http.StatusBadRequest, AuthStatus{
+		Status: "Fail", 
+		Message: "error, empty token"})
+	}
+	
+	token := strings.Replace(reqToken, "Bearer ", "", 1)
+
+	if isValid, err = ValidateToken(token); err != nil{
+		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status: "Fail", 
+			Message: "unable to process due to error processing token, "+err.Error(),
+		})
+		return 
+	}
+
+	if !isValid {
+		c.AbortWithError(http.StatusBadRequest, errors.New("inValid/expired User Login"))
+		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status: "Fail", 
+			Message: "unable to precess due to invalid or epired login"+err.Error(),
+		})
+		return
+	}
+	//
+
+
 	request := models.Skn{}
 
-	if err := c.ShouldBindJSON(&request); err != nil {
+	if err = c.ShouldBindJSON(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	err := db.GetDB().Debug().Create(&request).Error
+	err = db.GetDB().Debug().Create(&request).Error
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return

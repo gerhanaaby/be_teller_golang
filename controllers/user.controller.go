@@ -135,9 +135,9 @@ func ValidateToken(reqToken string) (bool, error) {
 	})
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-		return false, err
+		return false, errors.New("invalid token")
 		}
-		return false, err
+		return false, errors.New("invalid token")
 	}
 	if !tkn.Valid {
 		return false, errors.New("invalid token")
