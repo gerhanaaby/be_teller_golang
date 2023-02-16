@@ -28,5 +28,4 @@ func ConsumeAPIService(name string, model []byte) ([]byte, error) {
 	respBody, _ := ioutil.ReadAll(res.Body)
 
 	return respBody, nil
-
 }

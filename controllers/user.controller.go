@@ -38,8 +38,6 @@ func UserLoginController(c *gin.Context) {
 		})
 		return
 	}
-	
-	LoginToken, err := Login(request)
 
 	if request.Username == `` || request.Password == `` {
 		c.AbortWithError(http.StatusBadRequest, errors.New("empy username or password"))
@@ -53,7 +51,6 @@ func UserLoginController(c *gin.Context) {
 	fmt.Println("Username ----> "+request.Username)
 
 	LoginToken, err := Login(request)
-
 	if err != nil{
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
