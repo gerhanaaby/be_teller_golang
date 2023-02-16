@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"teller/db"
@@ -27,24 +28,46 @@ type Claims struct {
 var SecretKey = []byte("KMZWA87AWAA")
 
 func UserLoginController(c *gin.Context) {
-	var request models.SignInInput
+	request := models.SignInInput{}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status: "Fail", 
-			Message: "unable to login due wrong username or password",
+			Message: "unable to login due error",
 		})
 		return
 	}
 	
 	LoginToken, err := Login(request)
 
-	if LoginToken == `` || err != nil{
+	if request.Username == `` || request.Password == `` {
+		c.AbortWithError(http.StatusBadRequest, errors.New("empy username or password"))
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status: "Fail", 
+			Message: "empty username or password",
+		})
+		return
+	}
+
+	fmt.Println("Username ----> "+request.Username)
+
+	LoginToken, err := Login(request)
+
+	if err != nil{
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status: "Fail", 
-			Message: "unable to login due wrong username or password",
+			Message: "Wrong Username or Password",
+		})
+		return 
+	}
+
+	if LoginToken == ``{
+		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status: "Fail", 
+			Message: "unable to login due error getting token"+err.Error(),
 		})
 		return 
 	}
@@ -67,9 +90,14 @@ func Login(user models.SignInInput) (string, error){
 	username := user.Username
 	password := user.Password
 
-	err := db.GetDB().Where("username = ? AND password = ?", username, password).Find(&result).Error
+	err := db.GetDB().Where("username = ? AND password = ? AND verified = true", username, password).Find(&result).Error
 	if err != nil {
 		return ``, err
+	}
+
+	if result.Name == `` {
+		return ``, errors.New("user")
+
 	}
 
 	// Declare the expiration time of the token
@@ -90,7 +118,8 @@ func Login(user models.SignInInput) (string, error){
 	tokenString, err := token.SignedString(SecretKey)
 	if err != nil {
 		// If there is an error in creating the JWT return an internal server error
-		return  ``, err
+
+		return  ``, errors.New("token")
 	}
 
 	return tokenString, nil
@@ -110,9 +139,9 @@ func ValidateToken(reqToken string) (bool, error) {
 	})
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-		return false, err
+		return false, errors.New("invalid token")
 		}
-		return false, err
+		return false, errors.New("invalid token")
 	}
 	if !tkn.Valid {
 		return false, errors.New("invalid token")

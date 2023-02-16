@@ -8,18 +8,21 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-jwt/jwt/v4 v4.4.3
 	github.com/jackc/pgtype v1.14.0
+	github.com/joho/godotenv v1.5.1
 	github.com/k3a/html2text v1.1.0
 	github.com/spf13/viper v1.12.0
 	github.com/thanhpk/randstr v1.0.4
-	github.com/wpcodevo/golang-gorm-postgres v0.0.0-20221002140051-01396cc5d5a0
 	golang.org/x/crypto v0.4.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/postgres v1.4.7
 	gorm.io/gorm v1.24.5
 )
 
+require github.com/jackc/pgx/v4 v4.16.1 // indirect
+
 require (
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
+	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect

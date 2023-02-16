@@ -3,26 +3,33 @@ package routes
 import (
 	"teller/controllers"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func Routes() {
+
 	r := gin.Default()
 
-	r.POST("/postcustomer", controllers.PostCustomer)
-	r.POST("/postitem", controllers.PostItem)
-	r.POST("/postorder", controllers.PostOrder)
-	
-	r.POST("/teller/hostinq", controllers.HostInquiry)
+	r.Use(cors.New(cors.Config{
+		AllowAllOrigins: true,
+        // AllowOrigins: []string{"* or Write Alowed URL"},
+        AllowMethods: []string{"POST", "PUT", "PATCH", "DELETE"},
+        AllowHeaders: []string{"Content-Type,access-control-allow-origin, access-control-allow-headers"},
+    }))
 
-	r.GET("/getorder/:orderNo", controllers.GetOrder)
+    UserRoutes := r.Group("user")
+    {
 
-	r.PUT("/updateorder/:orderNo", controllers.UpdateOrder)
+		// UserAuthRoutes := ""
+		UserRoutes.POST("/auth/login", controllers.UserLoginController)
 
-	// r.POST("/user/auth/register")
+		UserTransRoutes := UserRoutes.Group("transac")
+		{
+		UserTransRoutes.POST("/postskn", controllers.PostSkn) ///user/transac/postskn
 
-	r.POST("/user/auth/login", controllers.UserLoginController)
-	// r.POST("/user/auth/verify", controllers.UserLoginVerify)
+		}
+	}
 
 	r.Run(":5000")
 }
