@@ -17,10 +17,16 @@ func Routes() {
         AllowHeaders: []string{"Content-Type,access-control-allow-origin, access-control-allow-headers"},
     }))
 
-    apiRoutes := r.Group("api/item")
+    UserRoutes := r.Group("user")
     {
-		apiRoutes.POST("/postskn", controllers.PostSkn)
-		apiRoutes.POST("/user/auth/login", controllers.UserLoginController)
+
+		UserRoutes.POST("/auth/login", controllers.UserLoginController)
+
+		UserTransRoutes := UserRoutes.Group("transac")
+		{
+		UserTransRoutes.POST("/postskn", controllers.PostSkn) ///user/transac/postskn
+
+		}
 	}
 
 	r.Run(":5000")
