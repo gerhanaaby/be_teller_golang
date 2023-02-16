@@ -2,11 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
-	"log"
 	"net/http"
-	"strings"
 	"teller/db"
 	"teller/models"
 	"teller/services"
@@ -15,64 +11,64 @@ import (
 )
 
 func PostSkn(c *gin.Context) {
-	var isValid bool
+	var isValid bool = false
 	var err error
-	reqToken := c.Request.Header.Get("Authorization")
-	if reqToken == "" {
-		c.AbortWithError(http.StatusInternalServerError, errors.New("error, empty token"))
-		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status:  "Fail",
-			Message: "error, empty token"})
-	}
 
-	token := strings.Replace(reqToken, "Bearer ", "", 1)
-
-	if isValid, err = ValidateToken(token); err != nil {
+	//--> TOKEN VALIDATION REQUEST
+	isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
+	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status:  "Fail",
-			Message: "unable to process due to error processing token, " + err.Error(),
+			Status: "Fail", 
+			Message: "unable to precess due"+err.Error(),
 		})
 		return
 	}
 
 	if !isValid {
-		c.AbortWithError(http.StatusBadRequest, errors.New("inValid/expired User Login"))
-		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status:  "Fail",
-			Message: "unable to precess due to invalid or epired login" + err.Error(),
+			Status: "Fail", 
+			Message: "unable to precess due invalid login or expired",
 		})
 		return
 	}
-	//
 
+	//--> API REQUEST PROCESS
 	request := models.Skn{}
 
 	if err = c.ShouldBindJSON(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status: "Fail", 
+			Message: "unable to precess due"+err.Error(),
+		})
 		return
 	}
 
 	err = db.GetDB().Debug().Create(&request).Error
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status: "Fail", 
+			Message: "unable to precess due"+err.Error(),
+		})
 		return
 	}
 
-	fmt.Println("===============================================")
-	fmt.Println("request", request)
+	dataResponse , err:= PostToAPIdev(request)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status: "Fail", 
+			Message: "unable to precess due"+err.Error(),
+		})
+		return
 
-	fmt.Println("===============================================")
-	PostToAPIdev(request)
-
-	dataResponse := PostToAPIdev(request)
-
+	}
 	c.JSON(http.StatusCreated, dataResponse)
-
 }
 
-func PostToAPIdev(dataSKN models.Skn) map[string]interface{} {
+func PostToAPIdev(dataSKN models.Skn) (map[string]interface{}, error) {
 
 	data := map[string]interface{}{
 		"creditAccountNo":           dataSKN.CreditAccountNo,
@@ -98,25 +94,20 @@ func PostToAPIdev(dataSKN models.Skn) map[string]interface{} {
 
 	requestJson, err := json.Marshal(data)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	body, err := services.ConsumeAPIService("skn", requestJson)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	var dataResponse map[string]interface{}
 	err = json.Unmarshal(body, &dataResponse)
 
-	// Check your errors!
 	if err != nil {
-		log.Fatal(err.Error())
+		return nil, err
 	}
 
-	fmt.Println("===============================================")
-
-	fmt.Println(string(body))
-	return dataResponse
-
+	return dataResponse, nil
 }
