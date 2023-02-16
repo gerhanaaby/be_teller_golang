@@ -9,14 +9,14 @@ import (
 
 func ConsumeAPIService(name string, model []byte) ([]byte, error) {
 
-	req, err := http.NewRequest(http.MethodPost, models.ApiList[name].Url, bytes.NewBuffer(model))
+	req, err := http.NewRequest(http.MethodPost, models.ApiMap[name].Url, bytes.NewBuffer(model))
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Set(`Content-Type`, `application/json`)
-	req.Header.Set(models.ApiList[name].Key, models.ApiList[name].Value)
-	
+	req.Header.Set(models.ApiMap[name].Key, models.ApiMap[name].Value)
+
 	client := &http.Client{}
 
 	res, err := client.Do(req)
