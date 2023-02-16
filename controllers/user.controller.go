@@ -52,7 +52,16 @@ func UserLoginController(c *gin.Context) {
 
 	LoginToken, err := Login(request)
 
-	if LoginToken == `` || err != nil{
+	if err != nil{
+		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status: "Fail", 
+			Message: "Wrong Username or Password",
+		})
+		return 
+	}
+
+	if LoginToken == ``{
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status: "Fail", 
@@ -84,6 +93,10 @@ func Login(user models.SignInInput) (string, error){
 		return ``, err
 	}
 
+	if result.Name == `` {
+		return ``, errors.New("user")
+	}
+
 	// Declare the expiration time of the token
 	// here, we have kept it as 5 minutes
 	expirationTime := time.Now().Add(5 * time.Minute)
@@ -102,7 +115,7 @@ func Login(user models.SignInInput) (string, error){
 	tokenString, err := token.SignedString(SecretKey)
 	if err != nil {
 		// If there is an error in creating the JWT return an internal server error
-		return  ``, err
+		return  ``, errors.New("token")
 	}
 
 	return tokenString, nil

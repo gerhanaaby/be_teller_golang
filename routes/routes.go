@@ -12,7 +12,8 @@ func Routes() {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
-        AllowOrigins: []string{"*"},
+		AllowAllOrigins: true,
+        // AllowOrigins: []string{"* or Write Alowed URL"},
         AllowMethods: []string{"POST", "PUT", "PATCH", "DELETE"},
         AllowHeaders: []string{"Content-Type,access-control-allow-origin, access-control-allow-headers"},
     }))
@@ -20,6 +21,7 @@ func Routes() {
     UserRoutes := r.Group("user")
     {
 
+		// UserAuthRoutes := ""
 		UserRoutes.POST("/auth/login", controllers.UserLoginController)
 
 		UserTransRoutes := UserRoutes.Group("transac")
