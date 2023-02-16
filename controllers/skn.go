@@ -3,8 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"teller/db"
@@ -52,28 +50,36 @@ func PostSkn(c *gin.Context) {
 
 	if err = c.ShouldBindJSON(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
-		return
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status: "Fail", 
+			Message: "unable to precess due"+err.Error(),
+		})
 	}
 
 	err = db.GetDB().Debug().Create(&request).Error
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status: "Fail", 
+			Message: "unable to precess due"+err.Error(),
+		})
 		return
 	}
 
-	fmt.Println("===============================================")
-	fmt.Println("request", request)
+	dataResponse , err:= PostToAPIdev(request)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status: "Fail", 
+			Message: "unable to precess due"+err.Error(),
+		})
+		return
 
-	fmt.Println("===============================================")
-	PostToAPIdev(request)
-
-	dataResponse := PostToAPIdev(request)
-
+	}
 	c.JSON(http.StatusCreated, dataResponse)
-
 }
 
-func PostToAPIdev(dataSKN models.Skn) map[string]interface{} {
+func PostToAPIdev(dataSKN models.Skn) (map[string]interface{}, error) {
 
 	data := map[string]interface{}{
 		"creditAccountNo":           dataSKN.CreditAccountNo,
@@ -99,25 +105,21 @@ func PostToAPIdev(dataSKN models.Skn) map[string]interface{} {
 
 	requestJson, err := json.Marshal(data)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	body, err := services.ConsumeAPIService("skn", requestJson)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	var dataResponse map[string]interface{}
 	err = json.Unmarshal(body, &dataResponse)
 
-	// Check your errors!
 	if err != nil {
-		log.Fatal(err.Error())
+		return nil, err
 	}
 
-	fmt.Println("===============================================")
-
-	fmt.Println(string(body))
-	return dataResponse
+	return dataResponse, nil
 
 }
