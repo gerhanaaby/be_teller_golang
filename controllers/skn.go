@@ -11,6 +11,7 @@ import (
 	"strings"
 	"teller/db"
 	"teller/models"
+	"teller/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -102,26 +103,10 @@ func PostToAPIdev(dataSKN models.Skn) map[string]interface{} {
 	if err != nil {
 		log.Fatal(err)
 	}
-	client := &http.Client{}
 
-	request, err := http.NewRequest("POST", "https://apidev.banksinarmas.com/internal/transactions/transfer/v2.0/skn", bytes.NewBuffer(requestJson))
-
-	request.Header.Set("Content-type", "application/json")
-	request.Header.Set("x-gateway-apikey", "97817cac-d589-4d9c-b9bf-a874f0ff943d")
-
+	body, err := services.ConsumeAPIService("skn", requestJson)
 	if err != nil {
-		log.Fatalln(err)
-	}
-	response, err := client.Do(request)
-	if err != nil {
-		log.Fatalln(err)
-
-	}
-	defer response.Body.Close()
-
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 
 	var dataResponse map[string]interface{}

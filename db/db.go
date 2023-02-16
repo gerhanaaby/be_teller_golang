@@ -26,7 +26,11 @@ func ConnectDB()  error {
 	if err != nil {
 		return err
 	}
-	db.AutoMigrate(&models.User{}, &models.Skn{})
+	db.AutoMigrate(&models.User{}, &models.Skn{}, &models.Apis{})
+
+	if err = db.Debug().Raw("SELECT * FROM apis").Scan(&models.ApiList).Error; err != nil  {
+		return err
+	}
 	return nil
 }
 func GetDB() *gorm.DB {
