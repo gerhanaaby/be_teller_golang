@@ -14,10 +14,10 @@ import (
 )
 
 type AuthStatus struct {
-	Status string `json:"status"`
-	Message string `json:"message"`
+	Status   string `json:"status"`
+	Message  string `json:"message"`
 	Username string `json:"username"`
-	Token string `json:"token"`
+	Token    string `json:"token"`
 }
 
 type Claims struct {
@@ -33,50 +33,50 @@ func UserLoginController(c *gin.Context) {
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
+			Status:  "Fail",
 			Message: "unable to login due error",
 		})
 		return
 	}
-	
+
 	LoginToken, err := Login(request)
 
 	if request.Username == `` || request.Password == `` {
 		c.AbortWithError(http.StatusBadRequest, errors.New("empy username or password"))
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
+			Status:  "Fail",
 			Message: "empty username or password",
 		})
 		return
 	}
 
-	fmt.Println("Username ----> "+request.Username)
+	fmt.Println("Username ----> " + request.Username)
 
 	LoginToken, err := Login(request)
 
-	if err != nil{
+	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
+			Status:  "Fail",
 			Message: "Wrong Username or Password",
 		})
-		return 
+		return
 	}
 
-	if LoginToken == ``{
+	if LoginToken == `` {
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
-			Message: "unable to login due error getting token"+err.Error(),
+			Status:  "Fail",
+			Message: "unable to login due error getting token" + err.Error(),
 		})
-		return 
+		return
 	}
 
 	c.JSON(http.StatusOK, AuthStatus{
-		Status: "Success", 
-		Message: "Login berhasil.",
+		Status:   "Success",
+		Message:  "Login berhasil.",
 		Username: request.Username,
-		Token: LoginToken,
+		Token:    LoginToken,
 	})
 	// http.SetCookie(w, &http.Cookie{
 	// 	Name:    "token",
@@ -85,7 +85,7 @@ func UserLoginController(c *gin.Context) {
 	// })
 }
 
-func Login(user models.SignInInput) (string, error){
+func Login(user models.SignInInput) (string, error) {
 	result := models.User{}
 	username := user.Username
 	password := user.Password
@@ -119,17 +119,17 @@ func Login(user models.SignInInput) (string, error){
 	if err != nil {
 		// If there is an error in creating the JWT return an internal server error
 
-		return  ``, errors.New("token")
+		return ``, errors.New("token")
 	}
 
 	return tokenString, nil
 }
 
 func ValidateToken(reqToken string) (bool, error) {
-	if reqToken == ""{
+	if reqToken == "" {
 		return false, errors.New("empty token")
 	}
-	
+
 	token := strings.Replace(reqToken, "Bearer ", "", 1)
 
 	claims := &Claims{}
@@ -139,7 +139,7 @@ func ValidateToken(reqToken string) (bool, error) {
 	})
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-		return false, errors.New("invalid token")
+			return false, errors.New("invalid token")
 		}
 		return false, errors.New("invalid token")
 	}
@@ -152,15 +152,15 @@ func ValidateToken(reqToken string) (bool, error) {
 
 func RefreshToken(c *gin.Context) {
 	reqToken := c.Request.Header.Get("Authorization")
-	if reqToken == ""{
+	if reqToken == "" {
 		c.AbortWithError(http.StatusInternalServerError, errors.New("error, empty token"))
 		c.JSON(http.StatusBadRequest, AuthStatus{
-		Status: "Fail", 
-		Message: "error, empty token"})
+			Status:  "Fail",
+			Message: "error, empty token"})
 	}
-	
+
 	token := strings.Replace(reqToken, "Bearer ", "", 1)
-		
+
 	claims := &Claims{}
 	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return SecretKey, nil
@@ -169,21 +169,21 @@ func RefreshToken(c *gin.Context) {
 		if err == jwt.ErrSignatureInvalid {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			c.JSON(http.StatusUnauthorized, AuthStatus{
-			Status: "Fail", 
-			Message: err.Error()})
-		return
+				Status:  "Fail",
+				Message: err.Error()})
+			return
 		}
 		c.AbortWithError(http.StatusInternalServerError, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
-		Status: "Fail", 
-		Message: err.Error()})
+			Status:  "Fail",
+			Message: err.Error()})
 		return
 	}
 	if !tkn.Valid {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		c.JSON(http.StatusUnauthorized, AuthStatus{
-		Status: "Fail", 
-		Message: err.Error()})
+			Status:  "Fail",
+			Message: err.Error()})
 		return
 	}
 	// (END) The code until this point is the same as the first part of the `Welcome` route
@@ -194,8 +194,8 @@ func RefreshToken(c *gin.Context) {
 	if time.Until(claims.ExpiresAt.Time) > 30*time.Second {
 		c.AbortWithError(http.StatusInternalServerError, errors.New("token expiry"))
 		c.JSON(http.StatusBadRequest, AuthStatus{
-		Status: "Fail", 
-		Message: "token expiry"})
+			Status:  "Fail",
+			Message: "token expiry"})
 		return
 	}
 
@@ -207,16 +207,16 @@ func RefreshToken(c *gin.Context) {
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, errors.New("error, can't generate new token"))
 		c.JSON(http.StatusBadRequest, AuthStatus{
-		Status: "Fail", 
-		Message: "can't generate new token"})
+			Status:  "Fail",
+			Message: "can't generate new token"})
 		return
 	}
 
 	// Set the new token as the users `token` cookie
 	c.JSON(http.StatusOK, AuthStatus{
-		Status: "Success", 
+		Status:  "Success",
 		Message: "Verified",
-		Token: tokenString,
+		Token:   tokenString,
 	})
 
 	// http.SetCookie(w, &http.Cookie{

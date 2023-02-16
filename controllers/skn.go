@@ -1,11 +1,9 @@
 package controllers
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -20,35 +18,34 @@ func PostSkn(c *gin.Context) {
 	var isValid bool
 	var err error
 	reqToken := c.Request.Header.Get("Authorization")
-	if reqToken == ""{
+	if reqToken == "" {
 		c.AbortWithError(http.StatusInternalServerError, errors.New("error, empty token"))
 		c.JSON(http.StatusBadRequest, AuthStatus{
-		Status: "Fail", 
-		Message: "error, empty token"})
+			Status:  "Fail",
+			Message: "error, empty token"})
 	}
-	
+
 	token := strings.Replace(reqToken, "Bearer ", "", 1)
 
-	if isValid, err = ValidateToken(token); err != nil{
+	if isValid, err = ValidateToken(token); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
-			Message: "unable to process due to error processing token, "+err.Error(),
+			Status:  "Fail",
+			Message: "unable to process due to error processing token, " + err.Error(),
 		})
-		return 
+		return
 	}
 
 	if !isValid {
 		c.AbortWithError(http.StatusBadRequest, errors.New("inValid/expired User Login"))
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
-			Message: "unable to precess due to invalid or epired login"+err.Error(),
+			Status:  "Fail",
+			Message: "unable to precess due to invalid or epired login" + err.Error(),
 		})
 		return
 	}
 	//
-
 
 	request := models.Skn{}
 
