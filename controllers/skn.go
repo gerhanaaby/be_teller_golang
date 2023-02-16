@@ -60,11 +60,7 @@ func PostSkn(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-
-	fmt.Println("===============================================")
-	fmt.Println("request", request)
-
-	fmt.Println("===============================================")
+	
 	PostToAPIdev(request)
 
 	dataResponse := PostToAPIdev(request)
@@ -114,8 +110,6 @@ func PostToAPIdev(dataSKN models.Skn) map[string]interface{} {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-
-	fmt.Println("===============================================")
 
 	fmt.Println(string(body))
 	return dataResponse
