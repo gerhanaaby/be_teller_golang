@@ -2,9 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
-	"strings"
 	"teller/db"
 	"teller/models"
 	"teller/services"
@@ -13,39 +11,29 @@ import (
 )
 
 func PostSkn(c *gin.Context) {
-	var isValid bool
+	var isValid bool = false
 	var err error
-	reqToken := c.Request.Header.Get("Authorization")
-	if reqToken == ""{
-		c.AbortWithError(http.StatusInternalServerError, errors.New("error, empty token"))
-		c.JSON(http.StatusBadRequest, AuthStatus{
-		Status: "Fail", 
-		Message: "error, empty token"})
-	}
-	
-	token := strings.Replace(reqToken, "Bearer ", "", 1)
 
-	if isValid, err = ValidateToken(token); err != nil{
+	//--> TOKEN VALIDATION REQUEST
+	isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
+	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status: "Fail", 
-			Message: "unable to process due to error processing token, "+err.Error(),
-		})
-		return 
-	}
-
-	if !isValid {
-		c.AbortWithError(http.StatusBadRequest, errors.New("inValid/expired User Login"))
-		c.AbortWithError(http.StatusBadRequest, err)
-		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
-			Message: "unable to precess due to invalid or epired login"+err.Error(),
+			Message: "unable to precess due"+err.Error(),
 		})
 		return
 	}
-	//
 
+	if !isValid {
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status: "Fail", 
+			Message: "unable to precess due invalid login or expired",
+		})
+		return
+	}
 
+	//--> API REQUEST PROCESS
 	request := models.Skn{}
 
 	if err = c.ShouldBindJSON(&request); err != nil {
@@ -54,6 +42,7 @@ func PostSkn(c *gin.Context) {
 			Status: "Fail", 
 			Message: "unable to precess due"+err.Error(),
 		})
+		return
 	}
 
 	err = db.GetDB().Debug().Create(&request).Error
@@ -121,5 +110,4 @@ func PostToAPIdev(dataSKN models.Skn) (map[string]interface{}, error) {
 	}
 
 	return dataResponse, nil
-
 }
