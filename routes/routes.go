@@ -11,13 +11,7 @@ func Routes() {
 
 	r := gin.Default()
 
-	r.POST("/postcustomer", controllers.PostCustomer)
-	r.POST("/postitem", controllers.PostItem)
-	r.POST("/postorder", controllers.PostOrder)
-	r.POST("/postskn", controllers.PostSkn)
-	r.POST("/user/auth/login", controllers.UserLoginController)
-	r.POST("/teller/hostinq", controllers.HostInquiry)
-	r.POST("/postinquirytransfer", controllers.PostInquiryTransfer)
+	//	r.POST("/postinquirytransfer", controllers.PostInquiryTransfer)
 	r.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
 		// AllowOrigins: []string{"* or Write Alowed URL"},
@@ -33,8 +27,11 @@ func Routes() {
 
 		UserTransRoutes := UserRoutes.Group("transac")
 		{
-			UserTransRoutes.POST("/postskn", controllers.PostSkn) ///user/transac/postskn
-
+			UserTransRoutes.POST("/postskn", controllers.PostSkn)                           ///user/transac/postskn
+			UserTransRoutes.POST("/postinquirytransfer", controllers.PostInquiryTransfer)   //inquiry transfer
+			UserTransRoutes.POST("/postinternaltransfer", controllers.PostInternalTransfer) //internal transfer
+			UserTransRoutes.POST("/postgetdetail", controllers.PostGetDetail)               // get detail
+			UserTransRoutes.POST("/postadvice", controllers.PostAdvice)                     // Advice
 		}
 	}
 
