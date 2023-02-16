@@ -11,22 +11,22 @@ import (
 
 var (
 	db  *gorm.DB
-	err error	
+	err error
 )
 
-func ConnectDB()  error {
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", 
-	os.Getenv(`PSQL_HOST`),
-	os.Getenv(`PSQL_PORT`),
-			os.Getenv(`PSQL_USER`),
-			os.Getenv(`PSQL_PASS`),
-			os.Getenv(`PSQL_DBNAME`))
-	fmt.Println(`PSQL---------------->`+psqlInfo)
+func ConnectDB() error {
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv(`PSQL_HOST`),
+		os.Getenv(`PSQL_PORT`),
+		os.Getenv(`PSQL_USER`),
+		os.Getenv(`PSQL_PASS`),
+		os.Getenv(`PSQL_DBNAME`))
+	fmt.Println(`PSQL---------------->` + psqlInfo)
 	db, err = gorm.Open(postgres.Open(psqlInfo), &gorm.Config{})
 	if err != nil {
 		return err
 	}
-	db.AutoMigrate(&models.User{}, &models.Skn{})
+	db.AutoMigrate(&models.User{}, &models.Skn{}, &models.InquiryTransfer{})
 	return nil
 }
 func GetDB() *gorm.DB {

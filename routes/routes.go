@@ -15,6 +15,7 @@ func Routes() {
 	r.POST("/postskn", controllers.PostSkn)
 	r.POST("/user/auth/login", controllers.UserLoginController)
 	r.POST("/teller/hostinq", controllers.HostInquiry)
+	r.POST("/postinquirytransfer", controllers.PostInquiryTransfer)
 
 	r.GET("/getorder/:orderNo", controllers.GetOrder)
 
