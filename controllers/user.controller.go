@@ -38,6 +38,8 @@ func UserLoginController(c *gin.Context) {
 		})
 		return
 	}
+	
+	LoginToken, err := Login(request)
 
 	if request.Username == `` || request.Password == `` {
 		c.AbortWithError(http.StatusBadRequest, errors.New("empy username or password"))
@@ -95,6 +97,7 @@ func Login(user models.SignInInput) (string, error){
 
 	if result.Name == `` {
 		return ``, errors.New("user")
+
 	}
 
 	// Declare the expiration time of the token
@@ -115,6 +118,7 @@ func Login(user models.SignInInput) (string, error){
 	tokenString, err := token.SignedString(SecretKey)
 	if err != nil {
 		// If there is an error in creating the JWT return an internal server error
+
 		return  ``, errors.New("token")
 	}
 
