@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"teller/models"
 	"teller/services"
@@ -12,10 +11,10 @@ import (
 
 
 type AuthStatus struct {
-	Status string `json:"status"`
-	Message string `json:"message"`
+	Status   string `json:"status"`
+	Message  string `json:"message"`
 	Username string `json:"username"`
-	Token string `json:"token"`
+	Token    string `json:"token"`
 }
 
 func UserLoginController(c *gin.Context) {
@@ -24,7 +23,7 @@ func UserLoginController(c *gin.Context) {
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
+			Status:  "Fail",
 			Message: "unable to login due error",
 		})
 		return
@@ -33,38 +32,36 @@ func UserLoginController(c *gin.Context) {
 	if request.Username == `` || request.Password == `` {
 		c.AbortWithError(http.StatusBadRequest, errors.New("empy username or password"))
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
+			Status:  "Fail",
 			Message: "empty username or password",
 		})
 		return
 	}
 
-	fmt.Println("Username ----> "+request.Username)
-
 	LoginToken, err := services.Login(request)
 	if err != nil{
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
+			Status:  "Fail",
 			Message: "Wrong Username or Password",
 		})
-		return 
+		return
 	}
 
-	if LoginToken == ``{
+	if LoginToken == `` {
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
-			Message: "unable to login due error getting token"+err.Error(),
+			Status:  "Fail",
+			Message: "unable to login due error getting token" + err.Error(),
 		})
-		return 
+		return
 	}
 
 	c.JSON(http.StatusOK, AuthStatus{
-		Status: "Success", 
-		Message: "Login berhasil.",
+		Status:   "Success",
+		Message:  "Login berhasil.",
 		Username: request.Username,
-		Token: LoginToken,
+		Token:    LoginToken,
 	})
 	// http.SetCookie(w, &http.Cookie{
 	// 	Name:    "token",
@@ -72,7 +69,6 @@ func UserLoginController(c *gin.Context) {
 	// 	Expires: expirationTime,
 	// })
 }
-
 
 // func RefreshToken(c *gin.Context) {
 // 	reqToken := c.Request.Header.Get("Authorization")
