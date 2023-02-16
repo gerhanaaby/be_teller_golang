@@ -1,45 +1,74 @@
 package controllers
 
 import (
-	"bytes"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"teller/db"
 	"teller/models"
+	"teller/services"
 
 	"github.com/gin-gonic/gin"
 )
 
 func PostGetDetail(c *gin.Context) {
+	var isValid bool = false
+	var err error
+
+	//--> TOKEN VALIDATION REQUEST
+	isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
+		return
+	}
+
+	if !isValid {
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due invalid login or expired",
+		})
+		return
+	}
+
+	//--> API REQUEST PROCESS
 	request := models.GetDetail{}
 
-	if err := c.ShouldBindJSON(&request); err != nil {
+	if err = c.ShouldBindJSON(&request); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
 		return
 	}
 
-	err := db.GetDB().Debug().Create(&request).Error
+	err = db.GetDB().Debug().Create(&request).Error
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
 		return
 	}
 
-	fmt.Println("===============================================")
-	fmt.Println("request inquiry", request)
+	dataResponse, err := PostToAPIGetDetail(request)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
+		return
 
-	fmt.Println("===============================================")
-	PostToAPIGetDetail(request)
-
-	dataResponse := PostToAPIGetDetail(request)
-
+	}
 	c.JSON(http.StatusCreated, dataResponse)
-
 }
 
-func PostToAPIGetDetail(dataGetDetail models.GetDetail) map[string]interface{} {
+func PostToAPIGetDetail(dataGetDetail models.GetDetail) (map[string]interface{}, error) {
 
 	data := map[string]interface{}{
 		"transactionID": dataGetDetail.TransactionID,
@@ -48,41 +77,20 @@ func PostToAPIGetDetail(dataGetDetail models.GetDetail) map[string]interface{} {
 
 	requestJson, err := json.Marshal(data)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	client := &http.Client{}
 
-	request, err := http.NewRequest("POST", "https://apidev.banksinarmas.com/internal/accounts/management/v2.0/getDetail", bytes.NewBuffer(requestJson))
-
-	request.Header.Set("Content-type", "application/json")
-	request.Header.Set("x-gateway-apikey", "97817cac-d589-4d9c-b9bf-a874f0ff943d")
-
+	body, err := services.ConsumeAPIService("getdetail", requestJson)
 	if err != nil {
-		log.Fatalln(err)
-	}
-	response, err := client.Do(request)
-	if err != nil {
-		log.Fatalln(err)
-
-	}
-	defer response.Body.Close()
-
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	var dataResponse map[string]interface{}
 	err = json.Unmarshal(body, &dataResponse)
 
-	// Check your errors!
 	if err != nil {
-		log.Fatal(err.Error())
+		return nil, err
 	}
 
-	fmt.Println("===============================================")
-
-	fmt.Println(string(body))
-	return dataResponse
-
+	return dataResponse, nil
 }
