@@ -113,3 +113,4 @@ func PostToAPIdev(dataSKN models.Skn) (map[string]interface{}, error) {
 
 	return dataResponse, nil
 }
+
