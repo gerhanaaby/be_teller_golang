@@ -14,16 +14,16 @@ func Routes() {
 	//	r.POST("/postinquirytransfer", controllers.PostInquiryTransfer)
 	r.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
-		// AllowOrigins: []string{"* or Write Alowed URL"},
+		// AllowOrigins: []string{"*"},
 		AllowMethods: []string{"POST", "PUT", "PATCH", "DELETE"},
-		AllowHeaders: []string{"Content-Type,access-control-allow-origin, access-control-allow-headers"},
+		AllowHeaders: []string{"Content-Type, Authorization, access-control-allow-origin, access-control-allow-headers"},
 	}))
 
 	UserRoutes := r.Group("user")
 	{
-
 		// UserAuthRoutes := ""
 		UserRoutes.POST("/auth/login", controllers.UserLoginController)
+		UserRoutes.POST("/tansact/postskn", controllers.PostSkn)
 
 		UserTransRoutes := UserRoutes.Group("transac")
 		{
