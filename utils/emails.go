@@ -1,73 +1,91 @@
 package utils
 
-// "github.com/wpcodevo/golang-gorm-postgres/models"
+import (
+	"bytes"
+	"crypto/tls"
+	"log"
+	"os"
+	"path/filepath"
+	"teller/inits"
+	"teller/models"
+	"text/template"
 
-// type EmailData struct {
-// 	URL       string
-// 	FirstName string
-// 	Subject   string
-// }
+	"github.com/k3a/html2text"
+	"gopkg.in/gomail.v2"
+)
 
-// // ? Email template parser
+type EmailData struct {
+	URL       string
+	FirstName string
+	Subject   string
+}
 
-// func ParseTemplateDir(dir string) (*template.Template, error) {
-// 	var paths []string
-// 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-// 		if err != nil {
-// 			return err
-// 		}
-// 		if !info.IsDir() {
-// 			paths = append(paths, path)
-// 		}
-// 		return nil
-// 	})
+/**
+ * @author [Fajar Dwi Nur Racmadi]
+ * @email [fajar.d.rachmadi@banksinarmas.com]
+ * @create date 2023-02-14
+ * @modify date 2023-02-20
+ * @desc [Email templater]
+ */
+func ParseTemplateDir(dir string) (*template.Template, error) {
+	var paths []string
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			paths = append(paths, path)
+		}
+		return nil
+	})
 
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	if err != nil {
+		return nil, err
+	}
 
-// 	return template.ParseFiles(paths...)
-// }
+	return template.ParseFiles(paths...)
+}
 
-// func SendEmail(user *models.User, data *EmailData) {
-// 	config, err := inits.LoadConfig(".")
+/**
+ * @author [Fajar Dwi Nur Racmadi]
+ * @email [fajar.d.rachmadi@banksinarmas.com]
+ * @create date 2023-02-14
+ * @modify date 2023-02-20
+ * @desc [Mengirim email]
+ */
+func SendEmail(user *models.User, data *EmailData) {
+	// Sender data.
+	from := inits.Cfg.EmailFrom
+	smtpPass := inits.Cfg.SMTPPass
+	smtpUser := inits.Cfg.SMTPUser
+	to := user.Email
+	smtpHost := inits.Cfg.SMTPHost
+	smtpPort := inits.Cfg.SMTPPort
 
-// 	if err != nil {
-// 		log.Fatal("could not load config", err)
-// 	}
+	var body bytes.Buffer
 
-// 	// Sender data.
-// 	from := config.EmailFrom
-// 	smtpPass := config.SMTPPass
-// 	smtpUser := config.SMTPUser
-// 	to := user.Email
-// 	smtpHost := config.SMTPHost
-// 	smtpPort := config.SMTPPort
+	template, err := ParseTemplateDir("templates")
+	if err != nil {
+		log.Fatal("Could not parse template", err)
+	}
 
-// 	var body bytes.Buffer
+	template.ExecuteTemplate(&body, "verificationCode.html", &data)
 
-// 	template, err := ParseTemplateDir("templates")
-// 	if err != nil {
-// 		log.Fatal("Could not parse template", err)
-// 	}
+	m := gomail.NewMessage()
 
-// 	template.ExecuteTemplate(&body, "verificationCode.html", &data)
+	m.SetHeader("From", from)
+	m.SetHeader("To", to)
+	m.SetHeader("Subject", data.Subject)
+	m.SetBody("text/html", body.String())
+	m.AddAlternative("text/plain", html2text.HTML2Text(body.String()))
 
-// 	m := gomail.NewMessage()
+	d := gomail.NewDialer(smtpHost, smtpPort, smtpUser, smtpPass)
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
-// 	m.SetHeader("From", from)
-// 	m.SetHeader("To", to)
-// 	m.SetHeader("Subject", data.Subject)
-// 	m.SetBody("text/html", body.String())
-// 	m.AddAlternative("text/plain", html2text.HTML2Text(body.String()))
+	// Send Email
+	if err := d.DialAndSend(m); err != nil {
+		log.Fatal("Could not send email: ", err)
+	}
 
-// 	d := gomail.NewDialer(smtpHost, smtpPort, smtpUser, smtpPass)
-// 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
-
-// 	// Send Email
-// 	if err := d.DialAndSend(m); err != nil {
-// 		log.Fatal("Could not send email: ", err)
-// 	}
-
-// }
+}
 

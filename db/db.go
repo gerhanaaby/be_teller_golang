@@ -14,7 +14,7 @@ var (
 	err error
 )
 
-func ConnectDB() (err error) {
+func ConnectDB() error {
 
 	models.ApiMap = make(map[string]models.Apis)
 

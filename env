@@ -1,11 +1,4 @@
 # Postgresql 13 server 82
-PSQL_DRIVER = postgres
-PSQL_HOST = localhost
-PSQL_PORT = 5432
-PSQL_USER = postgres
-PSQL_PASS = P@SS1234
-PSQL_DBNAME = teller
-
 POSTGRES_HOST = localhost
 POSTGRES_USER = golangdev
 POSTGRES_PASSWORD = simaS123
@@ -23,5 +16,7 @@ SMTP_PORT=
 
 TOKEN_EXPIRED_IN=60m
 TOKEN_MAXAGE=60
-
 TOKEN_SECRET=KMZWA87AWAA
+
+LOG_PATH_WINDOWS=C:/log
+LOG_PATH_LINUX=/home/golang/app/log/teller

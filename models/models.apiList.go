@@ -2,6 +2,13 @@ package models
 
 import "gorm.io/gorm"
 
+/**
+ * @author [Fajar Dwi Nur Racmadi]
+ * @email [fajar.d.rachmadi@banksinarmas.com]
+ * @create date 2023-02-16
+ * @modify date 2023-02-20
+ * @desc [Model api]
+ */
 type Apis struct {
 	gorm.Model
 

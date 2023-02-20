@@ -8,6 +8,13 @@ import (
 	"github.com/joho/godotenv"
 )
 
+/**
+ * @author [Fajar Dwi Nur Racmadi]
+ * @email [fajar.d.rachmadi@banksinarmas.com]
+ * @create date 2023-02-14
+ * @modify date 2023-02-20
+ * @desc [Model Config, LoadEnv dan Parse Env ke Config]
+ */
 var Cfg Config
 
 type Config struct {

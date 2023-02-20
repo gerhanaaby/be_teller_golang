@@ -8,6 +8,13 @@ import (
 	"time"
 )
 
+/**
+ * @author [Fajar Dwi Nur Racmadi]
+ * @email [fajar.d.rachmadi@banksinarmas.com]
+ * @create date 2023-02-16
+ * @modify date 2023-02-20
+ * @desc [Cek Keabsahan token pada jwt session]
+ */
 var LogFileName string
 var LogPerformace *os.File
 var LogReport *os.File
@@ -26,16 +33,15 @@ func WriteLog(prefix,info,filepath,logType string) error {
 
 	fsinfo, err := os.Stat(filepath)
 	if os.IsNotExist(err) {
-		WriteLogFile(&fileInfo, prefix, info)
 		return err
 	} else {
 		if fsinfo.Size() >= 20000000 {
 			//buat baru
-			counter, err := strconv.Atoi(filepath[15:])
+			counter, err := strconv.Atoi(LogFileName[15:])
 			if err != nil {
 				return err
 			}
-			filepath = filepath[:15] + strconv.Itoa(counter+1)
+			LogFileName = LogFileName[:15] + strconv.Itoa(counter+1)
 
 			WriteLogFile(&fileInfo, prefix, info)
 			return nil

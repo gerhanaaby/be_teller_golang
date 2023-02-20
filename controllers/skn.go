@@ -26,12 +26,15 @@ func PostSkn(c *gin.Context) {
 	//--> TOKEN VALIDATION REQUEST
 	isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
-		//
+		//****
 		services.WriteLog(
 			"[skn-fail]", 
-			fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime),
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
 			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
-		//
+		//****
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status: "Fail", 
@@ -44,7 +47,10 @@ func PostSkn(c *gin.Context) {
 		//****
 		services.WriteLog(
 			"[skn-fail]", 
-			fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime),
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
 			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 		//****
 		c.JSON(http.StatusBadRequest, AuthStatus{
@@ -60,7 +66,10 @@ func PostSkn(c *gin.Context) {
 		//****
 		services.WriteLog(
 			"[skn-fail]", 
-			fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime),
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
 			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 		//****
 		c.AbortWithError(http.StatusBadRequest, err)
@@ -76,7 +85,10 @@ func PostSkn(c *gin.Context) {
 		//****
 		services.WriteLog(
 			"[skn-fail]", 
-			fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime),
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
 			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 		//****
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -94,7 +106,10 @@ func PostSkn(c *gin.Context) {
 		//****
 		services.WriteLog(
 			"[skn-fail]", 
-			fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime),
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
 			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 		//****
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -107,7 +122,10 @@ func PostSkn(c *gin.Context) {
 	//****
 	services.WriteLog(
 		"[skn-done]", 
-		fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime),
+		fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+			time.Since(startTime).Milliseconds()-reqApiTime, 
+			reqApiTime,
+			time.Since(startTime).Milliseconds()),
 		inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 	//****
 	c.JSON(http.StatusCreated, dataResponse)
@@ -116,7 +134,6 @@ func PostSkn(c *gin.Context) {
 
 func PostToAPIdev(dataSKN models.Skn) (int64, map[string]interface{}, error) {
 	start := time.Now()
-	
 	data := map[string]interface{}{
 		"creditAccountNo":           dataSKN.CreditAccountNo,
 		"amount":                    dataSKN.Amount,
