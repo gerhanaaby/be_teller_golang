@@ -65,7 +65,14 @@ func PostInternalTransfer(c *gin.Context) {
 		return
 
 	}
-	c.JSON(http.StatusCreated, dataResponse)
+
+	logTransaction := dataResponse["$errorInfo"].(map[string]interface{})["$pipeline"].(map[string]interface{})["logTransaction"]
+	inputMessage := dataResponse["$errorInfo"].(map[string]interface{})["$pipeline"].(map[string]interface{})["inputMessage"]
+
+	c.JSON(http.StatusCreated, gin.H{
+		"logTransaction": logTransaction,
+		"inputMessage":   inputMessage,
+	})
 }
 
 func PostToAPIInternal(dataInternal models.InternalTransfer) (map[string]interface{}, error) {
