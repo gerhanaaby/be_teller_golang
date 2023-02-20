@@ -9,7 +9,8 @@ import (
 )
 
 var LogFileName string
-var LogWriter *os.File
+var LogPerformace *os.File
+var LogReport *os.File
 
 func WriteLog(prefix string, info string) error {
 

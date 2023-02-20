@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -144,6 +145,11 @@ func PostToAPIdev(dataSKN models.Skn) (int64, map[string]interface{}, error) {
 	}
 
 	//****
+	dst := &bytes.Buffer{}
+	if err := json.Compact(dst, body); err != nil {
+		return 0, nil, err
+	}
+	services.WriteLog("[skn-report]", dst.String())
 	return time.Since(start).Milliseconds(),dataResponse, nil
 	//****
 }

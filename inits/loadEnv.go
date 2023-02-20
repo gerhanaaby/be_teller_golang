@@ -30,7 +30,8 @@ type Config struct {
 	SMTPPort  int    `env:"SMTP_PORT,required"`
 	SMTPUser  string `env:"SMTP_USER,required"`
 
-	LogPath string
+	LogPerformancePath string
+	LogReportPath string
 	EnvPath string
 }
 
@@ -41,7 +42,7 @@ func LoadConfig(path string) (err error){
 		return err
 	}
 
-	err = env.Parse(&Cfg) // 👈 Parse environment variables into `Config`
+	err = env.Parse(&Cfg)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -49,19 +50,3 @@ func LoadConfig(path string) (err error){
 
 	return nil
 }
-
-// func LoadConfig(path string) (config Config, err error) {
-// 	viper.AddConfigPath(path)
-// 	viper.SetConfigType("env")
-// 	viper.SetConfigName("app")
-
-// 	viper.AutomaticEnv()
-
-// 	err = viper.ReadInConfig()
-// 	if err != nil {
-// 		return
-// 	}
-
-// 	err = viper.Unmarshal(&config)
-// 	return
-// }
