@@ -71,7 +71,7 @@ func PostInquiryTransfer(c *gin.Context) {
 		return
 	}
 
-	err = db.GetDB().Debug().Create(&request).Error
+	err = db.GetDB().Create(&request).Error
 	if err != nil {
 		services.WriteLog(
 			"[inquiry-transfer-fail]", 

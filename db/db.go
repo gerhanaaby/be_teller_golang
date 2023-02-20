@@ -32,7 +32,7 @@ func ConnectDB() error {
 	db.AutoMigrate(&models.User{}, &models.Skn{}, &models.Apis{}, &models.InquiryTransfer{}, &models.InternalTransfer{},
 		&models.GetDetail{}, &models.Advice{})
     
-	if err = db.Debug().Table(`apis`).Scan(&models.ApiList).Error; err != nil  {
+	if err = db.Table(`apis`).Scan(&models.ApiList).Error; err != nil  {
 		return err
 	}
 	fmt.Println(models.ApiList[0].Name)
