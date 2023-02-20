@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"teller/db"
 	"teller/inits"
+	"teller/routes"
 	"teller/services"
 	"time"
 )
@@ -73,5 +74,5 @@ func init() {
 
 func main() {
 	// Init()
-	// routes.Routes()	
+	routes.Routes()	
 }
