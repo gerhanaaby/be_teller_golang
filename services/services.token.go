@@ -8,12 +8,6 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-
-type Claims struct {
-	Username string `json:"username"`
-	jwt.RegisteredClaims
-}
-
 /**
  * @author [Fajar Dwi Nur Racmadi]
  * @email [fajar.d.rachmadi@banksinarmas.com]
@@ -21,6 +15,11 @@ type Claims struct {
  * @modify date 2023-02-20
  * @desc [Cek Keabsahan token pada jwt session]
  */
+ type Claims struct {
+	Username string `json:"username"`
+	jwt.RegisteredClaims
+}
+
 func CheckToken(reqToken string) (bool, error) {
 	var isValid bool
 	var err error
