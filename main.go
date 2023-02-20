@@ -39,6 +39,7 @@ func init() {
 			Hours := CurDate.Hour()
 			Minutes := CurDate.Minute()
 			services.LogFileName = services.InitLogFileName(CurDate)
+
 			services.LogPerformace, err = os.OpenFile(
 				inits.Cfg.LogPerformancePath+services.LogFileName,
 				os.O_WRONLY|os.O_APPEND|os.O_CREATE,
@@ -46,6 +47,7 @@ func init() {
 			if err != nil {
 				panic(err)
 			}
+			
 			services.LogReport, err = os.OpenFile(
 				inits.Cfg.LogReportPath+services.LogFileName,
 				os.O_WRONLY|os.O_APPEND|os.O_CREATE,

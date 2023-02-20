@@ -169,7 +169,7 @@ func PostToAPIdev(dataSKN models.Skn) (int64, map[string]interface{}, error) {
 		return 0, nil, err
 	}
 	services.WriteLog(
-		"[skn-fail]", 
+		"[skn-report]", 
 		dst.String(),
 		inits.Cfg.LogPerformancePath+services.LogFileName,"report")
 	return time.Since(start).Milliseconds(),dataResponse, nil

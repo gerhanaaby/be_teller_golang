@@ -42,7 +42,7 @@ func WriteLog(prefix,info,filepath,logType string) error {
 
 		} else {
 			//append
-			// WriteLogFile(prefix, info)
+			WriteLogFile(&fileInfo, prefix, info)
 			return nil
 
 		}
