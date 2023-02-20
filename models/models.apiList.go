@@ -14,3 +14,7 @@ type Apis struct {
 
 var ApiList []Apis
 var ApiMap map[string]Apis
+
+func (*Apis) TableName() string {
+	return "apis"
+}

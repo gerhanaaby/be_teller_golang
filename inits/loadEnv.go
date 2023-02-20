@@ -1,44 +1,67 @@
 package inits
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/spf13/viper"
+	"github.com/caarlos0/env/v6"
+	"github.com/joho/godotenv"
 )
 
+var Cfg Config
+
 type Config struct {
-	DBHost         string `mapstructure:"POSTGRES_HOST"`
-	DBUserName     string `mapstructure:"POSTGRES_USER"`
-	DBUserPassword string `mapstructure:"POSTGRES_PASSWORD"`
-	DBName         string `mapstructure:"POSTGRES_DB"`
-	DBPort         string `mapstructure:"POSTGRES_PORT"`
-	ServerPort     string `mapstructure:"PORT"`
+	DBHost         string `env:"POSTGRES_HOST,required"`
+	DBUserName     string `env:"POSTGRES_USER,required"`
+	DBUserPassword string `env:"POSTGRES_PASSWORD,required"`
+	DBName         string `env:"POSTGRES_DB,required"`
+	DBPort         string `env:"POSTGRES_PORT,required"`
+	ServerPort     string `env:"PORT,required"`
 
-	ClientOrigin string `mapstructure:"CLIENT_ORIGIN"`
+	ClientOrigin string `env:"CLIENT_ORIGIN"`
 
-	TokenSecret    string        `mapstructure:"TOKEN_SECRET"`
-	TokenExpiresIn time.Duration `mapstructure:"TOKEN_EXPIRED_IN"`
-	TokenMaxAge    int           `mapstructure:"TOKEN_MAXAGE"`
+	TokenSecret    string        `env:"TOKEN_SECRET,required"`
+	TokenExpiresIn time.Duration `env:"TOKEN_EXPIRED_IN,required"`
+	TokenMaxAge    int           `env:"TOKEN_MAXAGE,required"`
 
-	EmailFrom string `mapstructure:"EMAIL_FROM"`
-	SMTPHost  string `mapstructure:"SMTP_HOST"`
-	SMTPPass  string `mapstructure:"SMTP_PASS"`
-	SMTPPort  int    `mapstructure:"SMTP_PORT"`
-	SMTPUser  string `mapstructure:"SMTP_USER"`
+	EmailFrom string `env:"EMAIL_FROM,required"`
+	SMTPHost  string `env:"SMTP_HOST,required"`
+	SMTPPass  string `env:"SMTP_PASS,required"`
+	SMTPPort  int    `env:"SMTP_PORT,required"`
+	SMTPUser  string `env:"SMTP_USER,required"`
+
+	LogPath string
+	EnvPath string
 }
 
-func LoadConfig(path string) (config Config, err error) {
-	viper.AddConfigPath(path)
-	viper.SetConfigType("env")
-	viper.SetConfigName("app")
+func LoadConfig(path string) (err error){
 
-	viper.AutomaticEnv()
-
-	err = viper.ReadInConfig()
-	if err != nil {
-		return
+	if err := godotenv.Load(path); err != nil {
+		fmt.Println(err)
+		return err
 	}
 
-	err = viper.Unmarshal(&config)
-	return
+	err = env.Parse(&Cfg) // 👈 Parse environment variables into `Config`
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
 }
+
+// func LoadConfig(path string) (config Config, err error) {
+// 	viper.AddConfigPath(path)
+// 	viper.SetConfigType("env")
+// 	viper.SetConfigName("app")
+
+// 	viper.AutomaticEnv()
+
+// 	err = viper.ReadInConfig()
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	err = viper.Unmarshal(&config)
+// 	return
+// }
