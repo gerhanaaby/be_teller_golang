@@ -19,6 +19,13 @@ package controllers
 // 	"gorm.io/gorm"
 // )
 
+/**
+ * @author [Fajar Dwi Nur Racmadi]
+ * @email [fajar.d.rachmadi@banksinarmas.com]
+ * @create date 2023-02-14
+ * @modify date 2023-02-20
+ * @desc [Create Account, Verify Account]
+ */
 // type AuthController struct {
 // 	DB *gorm.DB
 // }

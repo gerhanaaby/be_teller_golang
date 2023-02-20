@@ -3,7 +3,6 @@ module teller
 go 1.18
 
 require (
-	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/caarlos0/env/v6 v6.10.1
 	github.com/gin-gonic/gin v1.8.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible
@@ -11,7 +10,6 @@ require (
 	github.com/jackc/pgtype v1.14.0
 	github.com/joho/godotenv v1.5.1
 	github.com/k3a/html2text v1.1.0
-	github.com/thanhpk/randstr v1.0.4
 	golang.org/x/crypto v0.4.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/postgres v1.4.7
