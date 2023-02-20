@@ -6,7 +6,6 @@ import (
 	"runtime"
 	"teller/db"
 	"teller/inits"
-	"teller/routes"
 	"teller/services"
 	"time"
 )
@@ -19,6 +18,7 @@ func init() {
 	if runtime.GOOS == `windows` {
 		inits.Cfg.EnvPath = `.env`
 		inits.Cfg.LogPerformancePath = `C:/Users/LENOVO/Desktop/log/performance`
+		inits.Cfg.LogReportPath = `C:/Users/LENOVO/Desktop/log/report`
 	} else if runtime.GOOS == `linux` {
 		inits.Cfg.EnvPath = "/home/golang/app/teller/env"
 		inits.Cfg.LogPerformancePath = "/home/golang/log/teller/performance"
@@ -73,5 +73,5 @@ func init() {
 
 func main() {
 	// Init()
-	routes.Routes()	
+	// routes.Routes()	
 }

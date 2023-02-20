@@ -1,7 +1,7 @@
 package services
 
 import (
-	"fmt"
+	"errors"
 	"log"
 	"os"
 	"strconv"
@@ -12,25 +12,32 @@ var LogFileName string
 var LogPerformace *os.File
 var LogReport *os.File
 
-func WriteLog(prefix string, info string) error {
+func WriteLog(prefix,info,filepath,logType string) error {
 
-	// filename := LogFileName
+	var fileInfo os.File
 
-	fsinfo, err := os.Stat(LogFileName)
+	if logType == "report" {
+		fileInfo = *LogReport
+	} else if logType == "performance" {
+		fileInfo = *LogPerformace
+	} else {
+		return errors.New("err invalid log type")
+	}
+
+	fsinfo, err := os.Stat(filepath)
 	if os.IsNotExist(err) {
-		fmt.Println("notexist")
-		// WriteLogFile(prefix, info)
+		WriteLogFile(&fileInfo, prefix, info)
 		return err
 	} else {
 		if fsinfo.Size() >= 20000000 {
 			//buat baru
-			counter, err := strconv.Atoi(LogFileName[15:])
+			counter, err := strconv.Atoi(filepath[15:])
 			if err != nil {
 				return err
 			}
-			LogFileName = LogFileName[:15] + strconv.Itoa(counter+1)
+			filepath = filepath[:15] + strconv.Itoa(counter+1)
 
-			// WriteLogFile(prefix, info)
+			WriteLogFile(&fileInfo, prefix, info)
 			return nil
 
 		} else {
@@ -43,7 +50,7 @@ func WriteLog(prefix string, info string) error {
 
 }
 
-func WriteLogFile(fileInfo *os.File, prefix string, info string) {
+func WriteLogFile(fileInfo *os.File, prefix,info string) {
 	// log.New(fileInfo, prefix, log.LstdFlags|log.Lshortfile|log.Lmicroseconds).Println(info)
 	log.New(
 		fileInfo, 

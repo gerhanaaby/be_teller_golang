@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"teller/db"
+	"teller/inits"
 	"teller/models"
 	"teller/services"
 	"time"
@@ -26,7 +27,10 @@ func PostSkn(c *gin.Context) {
 	isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
 		//
-		services.WriteLog("[skn-fail]", fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime))
+		services.WriteLog(
+			"[skn-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 		//
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
@@ -38,7 +42,10 @@ func PostSkn(c *gin.Context) {
 
 	if !isValid {
 		//****
-		services.WriteLog("[skn-fail]", fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime))
+		services.WriteLog(
+			"[skn-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 		//****
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status: "Fail", 
@@ -51,7 +58,10 @@ func PostSkn(c *gin.Context) {
 	request := models.Skn{}
 	if err = c.ShouldBindJSON(&request); err != nil {
 		//****
-		services.WriteLog("[skn-fail]", fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime))
+		services.WriteLog(
+			"[skn-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 		//****
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
@@ -64,7 +74,10 @@ func PostSkn(c *gin.Context) {
 	err = db.GetDB().Debug().Create(&request).Error
 	if err != nil {
 		//****
-		services.WriteLog("[skn-fail]", fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime))
+		services.WriteLog(
+			"[skn-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 		//****
 		c.AbortWithError(http.StatusInternalServerError, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
@@ -79,7 +92,10 @@ func PostSkn(c *gin.Context) {
 	//****
 	if err != nil {
 		//****
-		services.WriteLog("[skn-fail]", fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime))
+		services.WriteLog(
+			"[skn-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 		//****
 		c.AbortWithError(http.StatusInternalServerError, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
@@ -89,7 +105,10 @@ func PostSkn(c *gin.Context) {
 		return
 	}
 	//****
-	services.WriteLog("[skn-done]", fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime))
+	services.WriteLog(
+		"[skn-done]", 
+		fmt.Sprintf("Go-Time: %dms, Api-TIme: %dms",time.Since(startTime).Milliseconds(), reqApiTime),
+		inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 	//****
 	c.JSON(http.StatusCreated, dataResponse)
 }
@@ -149,7 +168,10 @@ func PostToAPIdev(dataSKN models.Skn) (int64, map[string]interface{}, error) {
 	if err := json.Compact(dst, body); err != nil {
 		return 0, nil, err
 	}
-	services.WriteLog("[skn-report]", dst.String())
+	services.WriteLog(
+		"[skn-fail]", 
+		dst.String(),
+		inits.Cfg.LogPerformancePath+services.LogFileName,"report")
 	return time.Since(start).Milliseconds(),dataResponse, nil
 	//****
 }
