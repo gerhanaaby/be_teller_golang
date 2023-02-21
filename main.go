@@ -22,8 +22,8 @@ func init() {
 		inits.Cfg.LogReportPath = `C:/Users/LENOVO/Desktop/log/report/`
 	} else if runtime.GOOS == `linux` {
 		inits.Cfg.EnvPath = "/home/golang/app/teller/env"
-		inits.Cfg.LogPerformancePath = "/home/golang/log/teller/performance"
-		inits.Cfg.LogReportPath = "/home/golang/log/teller/report"
+		inits.Cfg.LogPerformancePath = "/home/golang/log/teller/performance/"
+		inits.Cfg.LogReportPath = "/home/golang/log/teller/report/"
 	} else {
 		panic(errors.New("error, os not widnows or linux"))
 	}
@@ -72,7 +72,6 @@ func init() {
 
 	
 }
-
 
 func main() {
 	// Init()

@@ -1,5 +1,13 @@
 package controllers
 
+import (
+	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
+)
+
 // import (
 // 	"net/http"
 // 	"strings"
@@ -107,8 +115,26 @@ package controllers
 // 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "message": message})
 // }
 
-// // [...] SignOut User
-// func (ac *AuthController) LogoutUser(ctx *gin.Context) {
-// 	ctx.SetCookie("token", "", -1, "/", "localhost", false, true)
-// 	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
-// }
+// [...] SignOut User
+func (ac *AuthController) LogoutUser(ctx *gin.Context) {
+
+	if GlobalCorsEnabled {
+		enableCors(&w)
+	}
+
+	tkn, failedAuth := CheckJwtAuth(w, r)
+	if failedAuth {
+		return
+	}
+
+	//remove old token from list
+	whiteListTokens = remove(whiteListTokens, tkn.Raw)
+
+	w.Write([]byte(fmt.Sprintf("LoggedOut")))
+
+	ctx.SetCookie("token", "", -1, "/", "localhost", false, true)
+	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
+
+time.Now().UnixMicro()
+
+}
