@@ -24,12 +24,12 @@ func PostInternalTransfer(c *gin.Context) {
 	isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
 		services.WriteLog(
-			"[internal-transfer-fail]", 
+			"[internal-transfer-fail]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
+				time.Since(startTime).Milliseconds()-reqApiTime,
 				reqApiTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status:  "Fail",
@@ -40,12 +40,12 @@ func PostInternalTransfer(c *gin.Context) {
 
 	if !isValid {
 		services.WriteLog(
-			"[internal-transfer-fail]", 
+			"[internal-transfer-fail]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
+				time.Since(startTime).Milliseconds()-reqApiTime,
 				reqApiTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status:  "Fail",
 			Message: "unable to precess due invalid login or expired",
@@ -57,12 +57,12 @@ func PostInternalTransfer(c *gin.Context) {
 	request := models.InternalTransfer{}
 	if err = c.ShouldBindJSON(&request); err != nil {
 		services.WriteLog(
-			"[internal-transfer-fail]", 
+			"[internal-transfer-fail]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
+				time.Since(startTime).Milliseconds()-reqApiTime,
 				reqApiTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status:  "Fail",
@@ -74,12 +74,12 @@ func PostInternalTransfer(c *gin.Context) {
 	err = db.GetDB().Create(&request).Error
 	if err != nil {
 		services.WriteLog(
-			"[internal-transfer-fail]", 
+			"[internal-transfer-fail]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
+				time.Since(startTime).Milliseconds()-reqApiTime,
 				reqApiTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status:  "Fail",
@@ -91,12 +91,12 @@ func PostInternalTransfer(c *gin.Context) {
 	reqApiTime, dataResponse, err := PostToAPIInternal(request)
 	if err != nil {
 		services.WriteLog(
-			"[internal-transfer-fail]", 
+			"[internal-transfer-fail]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
+				time.Since(startTime).Milliseconds()-reqApiTime,
 				reqApiTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status:  "Fail",
@@ -108,14 +108,14 @@ func PostInternalTransfer(c *gin.Context) {
 
 	logTransaction := dataResponse["$errorInfo"].(map[string]interface{})["$pipeline"].(map[string]interface{})["logTransaction"]
 	inputMessage := dataResponse["$errorInfo"].(map[string]interface{})["$pipeline"].(map[string]interface{})["inputMessage"]
-	
+
 	services.WriteLog(
-		"[internal-transfer-done]", 
+		"[internal-transfer-done]",
 		fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-			time.Since(startTime).Milliseconds()-reqApiTime, 
+			time.Since(startTime).Milliseconds()-reqApiTime,
 			reqApiTime,
 			time.Since(startTime).Milliseconds()),
-		inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+		inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 
 	c.JSON(http.StatusCreated, gin.H{
 		"logTransaction": logTransaction,
@@ -158,8 +158,8 @@ func PostToAPIInternal(dataInternal models.InternalTransfer) (int64, map[string]
 		return 0, nil, err
 	}
 	services.WriteLog(
-		"[internal-transfer-report]", 
+		"[internal-transfer-report]",
 		dst.String(),
-		inits.Cfg.LogPerformancePath+services.LogFileName,"report")
-		return time.Since(start).Milliseconds(),dataResponse, nil
-	}
+		inits.Cfg.LogPerformancePath+services.LogFileName, "report")
+	return time.Since(start).Milliseconds(), dataResponse, nil
+}
