@@ -2,7 +2,7 @@ package models
 
 import "gorm.io/gorm"
 
-type Item struct {
+type STransaction struct {
 	gorm.Model
 
 	ID       uint   `json:"id"`
@@ -12,7 +12,7 @@ type Item struct {
 	OrderID  uint   `json:"orderId"`
 }
 
-type Itemjadi struct {
+type STransactionjadi struct {
 	ID       uint   `json:"id" `
 	ItemId   string `json:"itemId" gorm:"type:varchar(7)"`
 	Nama     string `json:"nama" gorm:"type:varchar(50)"`
@@ -20,10 +20,10 @@ type Itemjadi struct {
 	OrderID  uint   `json:"orderId" `
 }
 
-func (*Item) TableName() string {
-	return "item"
+func (*STransaction) TableName() string {
+	return "sendtransaction"
 }
 
-func (*Itemjadi) TableName() string {
-	return "item"
+func (*STransactionjadi) TableName() string {
+	return "sendtransaction"
 }

@@ -1,23 +1,38 @@
 package routes
 
 import (
-	"golang/controllers"
+	"teller/controllers"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func Routes() {
+
 	r := gin.Default()
+	r.Use(cors.New(cors.Config{
+		AllowAllOrigins: true,
+		// AllowOrigins: []string{"*"},
+		AllowMethods: []string{"POST", "PUT", "PATCH", "DELETE"},
+		AllowHeaders: []string{"Content-Type, Authorization, access-control-allow-origin, access-control-allow-headers"},
+	}))
 
-	r.POST("/postcustomer", controllers.PostCustomer)
-	r.POST("/postitem", controllers.PostItem)
-	r.POST("/postorder", controllers.PostOrder)
-	
-	r.POST("/teller/hostinq", controllers.HostInquiry)
 
-	r.GET("/getorder/:orderNo", controllers.GetOrder)
+	UserRoutes := r.Group("user")
+	{
 
-	r.PUT("/updateorder/:orderNo", controllers.UpdateOrder)
+		UserRoutes.POST("/auth/login", controllers.UserLoginController)
+		UserRoutes.POST("/tansact/postskn", controllers.PostSkn)
+
+		UserTransRoutes := UserRoutes.Group("transac")
+		{
+			UserTransRoutes.POST("/postskn", controllers.PostSkn)                           ///user/transac/postskn
+			UserTransRoutes.POST("/postinquirytransfer", controllers.PostInquiryTransfer)   // inquiry transfer
+			UserTransRoutes.POST("/postinternaltransfer", controllers.PostInternalTransfer) // internal transfer
+			UserTransRoutes.POST("/postgetdetail", controllers.PostGetDetail)               // get detail
+			UserTransRoutes.POST("/postadvice", controllers.PostAdvice)                     // Advice
+		}
+	}
 
 
 
