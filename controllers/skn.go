@@ -19,35 +19,35 @@ func PostSkn(c *gin.Context) {
 	var reqApiTime int64 = 0
 	var isValid bool = false
 	var err error
-	
+
 	//--> TOKEN VALIDATION REQUEST
 	isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
 		services.WriteLog(
-			"[skn-fail]", 
+			"[skn-fail]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
+				time.Since(startTime).Milliseconds()-reqApiTime,
 				reqApiTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
-			Message: "unable to precess due"+err.Error(),
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
 		})
 		return
 	}
 
 	if !isValid {
 		services.WriteLog(
-			"[skn-fail]", 
+			"[skn-fail]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
+				time.Since(startTime).Milliseconds()-reqApiTime,
 				reqApiTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
+			Status:  "Fail",
 			Message: "unable to precess due invalid login or expired",
 		})
 		return
@@ -57,16 +57,16 @@ func PostSkn(c *gin.Context) {
 	request := models.Skn{}
 	if err = c.ShouldBindJSON(&request); err != nil {
 		services.WriteLog(
-			"[skn-fail]", 
+			"[skn-fail]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
+				time.Since(startTime).Milliseconds()-reqApiTime,
 				reqApiTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
-			Message: "unable to precess due"+err.Error(),
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
 		})
 		return
 	}
@@ -74,46 +74,46 @@ func PostSkn(c *gin.Context) {
 	err = db.GetDB().Create(&request).Error
 	if err != nil {
 		services.WriteLog(
-			"[skn-fail]", 
+			"[skn-fail]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
+				time.Since(startTime).Milliseconds()-reqApiTime,
 				reqApiTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
-			Message: "unable to precess due"+err.Error(),
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
 		})
 		return
 	}
 
-	reqApiTime, dataResponse , err:= PostToAPIdev(request)
+	reqApiTime, dataResponse, err := PostToAPIdev(request)
 	if err != nil {
 		services.WriteLog(
-			"[skn-fail]", 
+			"[skn-fail]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
+				time.Since(startTime).Milliseconds()-reqApiTime,
 				reqApiTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
-			Message: "unable to precess due"+err.Error(),
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
 		})
 		return
 	}
 	services.WriteLog(
-		"[skn-done]", 
+		"[skn-done]",
 		fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-			time.Since(startTime).Milliseconds()-reqApiTime, 
+			time.Since(startTime).Milliseconds()-reqApiTime,
 			reqApiTime,
 			time.Since(startTime).Milliseconds()),
-		inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+		inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
+
 	c.JSON(http.StatusCreated, dataResponse)
 }
-
 
 func PostToAPIdev(dataSKN models.Skn) (int64, map[string]interface{}, error) {
 	start := time.Now()
@@ -161,8 +161,8 @@ func PostToAPIdev(dataSKN models.Skn) (int64, map[string]interface{}, error) {
 		return 0, nil, err
 	}
 	services.WriteLog(
-		"[skn-report]", 
+		"[skn-report]",
 		dst.String(),
-		inits.Cfg.LogPerformancePath+services.LogFileName,"report")
-	return time.Since(start).Milliseconds(),dataResponse, nil
+		inits.Cfg.LogPerformancePath+services.LogFileName, "report")
+	return time.Since(start).Milliseconds(), dataResponse, nil
 }

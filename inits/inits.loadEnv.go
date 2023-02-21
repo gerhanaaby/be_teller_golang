@@ -38,11 +38,11 @@ type Config struct {
 	SMTPUser  string `env:"SMTP_USER,required"`
 
 	LogPerformancePath string
-	LogReportPath string
-	EnvPath string
+	LogReportPath      string
+	EnvPath            string
 }
 
-func LoadConfig(path string) (err error){
+func LoadConfig(path string) (err error) {
 
 	if err := godotenv.Load(path); err != nil {
 		fmt.Println(err)
