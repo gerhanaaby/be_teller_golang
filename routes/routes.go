@@ -17,6 +17,7 @@ func Routes() {
 		AllowHeaders: []string{"Content-Type, Authorization, access-control-allow-origin, access-control-allow-headers"},
 	}))
 
+
 	UserRoutes := r.Group("user")
 	{
 
@@ -32,6 +33,8 @@ func Routes() {
 			UserTransRoutes.POST("/postadvice", controllers.PostAdvice)                     // Advice
 		}
 	}
+
+
 
 	r.Run(":5000")
 }
