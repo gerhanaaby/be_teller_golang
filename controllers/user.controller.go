@@ -1,3 +1,10 @@
+/**
+ * @author [Fajar Dwi Nur Racmadi]
+ * @email [fajar.d.rachmadi@banksinarmas.com]
+ * @create date 2023-02-14
+ * @modify date 2023-02-27
+ * @desc [User Controller (Login)]
+ */
 package controllers
 
 import (
@@ -9,13 +16,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-/**
- * @author [Fajar Dwi Nur Racmadi]
- * @email [fajar.d.rachmadi@banksinarmas.com]
- * @create date 2023-02-14
- * @modify date 2023-02-20
- * @desc [User Controller (Login)]
- */
 type AuthStatus struct {
 	Status   string `json:"status"`
 	Message  string `json:"message"`
@@ -70,6 +70,7 @@ func UserLoginController(c *gin.Context) {
 		Token:    LoginToken,
 	})
 }
+
 
 // func RefreshToken(c *gin.Context) {
 // 	reqToken := c.Request.Header.Get("Authorization")

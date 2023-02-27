@@ -21,7 +21,7 @@ func PostAdvice(c *gin.Context) {
 	var err error
 
 	//--> TOKEN VALIDATION REQUEST
-	isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
+	_,isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
 		services.WriteLog(
 			"[advice-fail]", 
@@ -153,6 +153,6 @@ func PostToAPIAdvice(dataAdvice models.Advice) (int64, map[string]interface{}, e
 	services.WriteLog(
 		"[advice-report]", 
 		dst.String(),
-		inits.Cfg.LogPerformancePath+services.LogFileName,"report")
+		inits.Cfg.LogReportPath+services.LogFileName,"report")
 	return time.Since(start).Milliseconds(),dataResponse, nil
 }

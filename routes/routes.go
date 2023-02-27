@@ -22,11 +22,10 @@ func Routes() {
 	{
 
 		UserRoutes.POST("/auth/login", controllers.UserLoginController)
-		UserRoutes.POST("/tansact/postskn", controllers.PostSkn)
 
 		UserTransRoutes := UserRoutes.Group("transac")
 		{
-			UserTransRoutes.POST("/postskn", controllers.PostSkn)                           ///user/transac/postskn
+			UserTransRoutes.POST("/postskn", controllers.SKN)                           ///user/transac/postskn
 			UserTransRoutes.POST("/postinquirytransfer", controllers.PostInquiryTransfer)   // inquiry transfer
 			UserTransRoutes.POST("/postinternaltransfer", controllers.PostInternalTransfer) // internal transfer
 			UserTransRoutes.POST("/postgetdetail", controllers.PostGetDetail)               // get detail
