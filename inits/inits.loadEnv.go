@@ -39,6 +39,7 @@ type Config struct {
 
 	LogPerformancePath string
 	LogReportPath      string
+	Base64Path         string
 	EnvPath            string
 }
 

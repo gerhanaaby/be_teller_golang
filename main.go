@@ -16,12 +16,14 @@ func init() {
 
 	if runtime.GOOS == `windows` {
 		inits.Cfg.EnvPath = `.env`
-		inits.Cfg.LogPerformancePath = `C:/Users/THINKPAD/OneDrive/Documents/Teller/Performance`
-		inits.Cfg.LogReportPath = `C:/Users/THINKPAD/OneDrive/Documents/Teller/Report`
+		inits.Cfg.LogPerformancePath = `C:/Users/LENOVO/Desktop/log/performance/`
+		inits.Cfg.LogReportPath = `C:/Users/LENOVO/Desktop/log/report/`
+		inits.Cfg.Base64Path = `C:/Users/LENOVO/Desktop/log/base64/`
 	} else if runtime.GOOS == `linux` {
 		inits.Cfg.EnvPath = "/home/golang/app/teller/env"
 		inits.Cfg.LogPerformancePath = "/home/golang/log/teller/performance/"
 		inits.Cfg.LogReportPath = "/home/golang/log/teller/report/"
+		inits.Cfg.Base64Path = "/home/golang/base64/teller/"
 	} else {
 		panic(errors.New("error, os not widnows or linux"))
 	}

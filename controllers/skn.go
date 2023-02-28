@@ -20,7 +20,6 @@ func SKN(c *gin.Context) {
 	startTime := time.Now()
 
 	if ReqTime, Response, err := TransactSKN(c); err != nil {
-
 		services.WriteLog(
 			"[fail][skn]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
