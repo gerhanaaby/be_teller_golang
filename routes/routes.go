@@ -31,6 +31,11 @@ func Routes() {
 			UserTransRoutes.POST("/postgetdetail", controllers.PostGetDetail)               // get detail
 			UserTransRoutes.POST("/postadvice", controllers.PostAdvice)                     // Advice
 		}
+
+		UserUtilityRoutes := UserRoutes.Group("utils")
+		{
+			UserUtilityRoutes.GET("/getb64/:cif", controllers.GetBase64ByCif)
+		}
 	}
 
 
