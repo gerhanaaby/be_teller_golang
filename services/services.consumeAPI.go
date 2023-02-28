@@ -2,9 +2,11 @@ package services
 
 import (
 	"bytes"
+	"context"
 	"io/ioutil"
 	"net/http"
 	"teller/models"
+	"time"
 )
 
 /**
@@ -15,7 +17,6 @@ import (
  * @desc [Fungsi consume api]
  */
 func ConsumeAPIService(name string, model []byte) ([]byte, error) {
-
 	req, err := http.NewRequest(http.MethodPost, models.ApiMap[name].Url, bytes.NewBuffer(model))
 	if err != nil {
 		return nil, err
@@ -23,6 +24,9 @@ func ConsumeAPIService(name string, model []byte) ([]byte, error) {
 
 	req.Header.Set(`Content-Type`, `application/json`)
 	req.Header.Set(models.ApiMap[name].Key, models.ApiMap[name].Value)
+
+	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second)
+	req = req.WithContext(ctx)
 
 	client := &http.Client{}
 
