@@ -7,14 +7,23 @@ import (
 	"gorm.io/gorm"
 )
 
+/**
+ * @author [Fajar Dwi Nur Racmadi]
+ * @email [fajar.d.rachmadi@banksinarmas.com]
+ * @create date 2023-02-14
+ * @modify date 2023-02-20
+ * @desc [Model user]
+ */
 type User struct {
 	gorm.Model
 
-	ID     				int64       `json:"userid" gorm:"type:serial;primary_key"`
+	ID     			 int64     `json:"userid" gorm:"type:serial;primary_key"`
 	Name             string    `gorm:"type:varchar(255);not null"`
 	Username 		 string    `gorm:"uniqueIndex;not null"`
 	Email            string    `gorm:"uniqueIndex;not null"`
 	Password         string    `gorm:"not null"`
+	Nik				 string    `gorm:"type:varchar(255);not null"`
+	BranchCode		 string    `gorm:"type:varchar(255);not null"`
 	Roles            string    `gorm:"type:varchar(255);not null"`
 	Division         string    `gorm:"type:varchar(255);not null"`
 	Photo            string    `gorm:"not null"`

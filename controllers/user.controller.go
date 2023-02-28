@@ -9,7 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
+/**
+ * @author [Fajar Dwi Nur Racmadi]
+ * @email [fajar.d.rachmadi@banksinarmas.com]
+ * @create date 2023-02-14
+ * @modify date 2023-02-20
+ * @desc [User Controller (Login)]
+ */
 type AuthStatus struct {
 	Status   string `json:"status"`
 	Message  string `json:"message"`
@@ -63,11 +69,6 @@ func UserLoginController(c *gin.Context) {
 		Username: request.Username,
 		Token:    LoginToken,
 	})
-	// http.SetCookie(w, &http.Cookie{
-	// 	Name:    "token",
-	// 	Value:   tokenString,
-	// 	Expires: expirationTime,
-	// })
 }
 
 // func RefreshToken(c *gin.Context) {
@@ -83,7 +84,7 @@ func UserLoginController(c *gin.Context) {
 		
 // 	claims := &Claims{}
 // 	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-// 		return []byte(os.Getenv("TOKEN_SECRET")), nil
+// 		return []byte(inits.Cfg.TokenSecret), nil
 // 	})
 // 	if err != nil {
 // 		if err == jwt.ErrSignatureInvalid {
@@ -123,7 +124,7 @@ func UserLoginController(c *gin.Context) {
 // 	expirationTime := time.Now().Add(5 * time.Minute)
 // 	claims.ExpiresAt = jwt.NewNumericDate(expirationTime)
 // 	newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-// 	tokenString, err := newToken.SignedString([]byte(os.Getenv("TOKEN_SECRET")))
+// 	tokenString, err := newToken.SignedString([]byte(inits.Cfg.TokenSecret))
 // 	if err != nil {
 // 		c.AbortWithError(http.StatusInternalServerError, errors.New("error, can't generate new token"))
 // 		c.JSON(http.StatusBadRequest, AuthStatus{

@@ -3,15 +3,14 @@ package utils
 import (
 	"bytes"
 	"crypto/tls"
-	"html/template"
 	"log"
 	"os"
 	"path/filepath"
 	"teller/inits"
 	"teller/models"
+	"text/template"
 
 	"github.com/k3a/html2text"
-	// "github.com/wpcodevo/golang-gorm-postgres/models"
 	"gopkg.in/gomail.v2"
 )
 
@@ -21,8 +20,13 @@ type EmailData struct {
 	Subject   string
 }
 
-// ? Email template parser
-
+/**
+ * @author [Fajar Dwi Nur Racmadi]
+ * @email [fajar.d.rachmadi@banksinarmas.com]
+ * @create date 2023-02-14
+ * @modify date 2023-02-20
+ * @desc [Email templater]
+ */
 func ParseTemplateDir(dir string) (*template.Template, error) {
 	var paths []string
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
@@ -42,20 +46,21 @@ func ParseTemplateDir(dir string) (*template.Template, error) {
 	return template.ParseFiles(paths...)
 }
 
+/**
+ * @author [Fajar Dwi Nur Racmadi]
+ * @email [fajar.d.rachmadi@banksinarmas.com]
+ * @create date 2023-02-14
+ * @modify date 2023-02-20
+ * @desc [Mengirim email]
+ */
 func SendEmail(user *models.User, data *EmailData) {
-	config, err := inits.LoadConfig(".")
-
-	if err != nil {
-		log.Fatal("could not load config", err)
-	}
-
 	// Sender data.
-	from := config.EmailFrom
-	smtpPass := config.SMTPPass
-	smtpUser := config.SMTPUser
+	from := inits.Cfg.EmailFrom
+	smtpPass := inits.Cfg.SMTPPass
+	smtpUser := inits.Cfg.SMTPUser
 	to := user.Email
-	smtpHost := config.SMTPHost
-	smtpPort := config.SMTPPort
+	smtpHost := inits.Cfg.SMTPHost
+	smtpPort := inits.Cfg.SMTPPort
 
 	var body bytes.Buffer
 

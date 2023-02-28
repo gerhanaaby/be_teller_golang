@@ -4,43 +4,119 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"teller/db"
+	"teller/inits"
 	"teller/models"
+	"teller/services"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func PostInquiryTransfer(c *gin.Context) {
-	request := models.InquiryTransfer{}
+	startTime := time.Now()
+	var reqApiTime int64 = 0
+	var isValid bool = false
+	var err error
 
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	err := db.GetDB().Debug().Create(&request).Error
+	//--> TOKEN VALIDATION REQUEST
+	isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		services.WriteLog(
+			"[inquiry-transfer-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
 		return
 	}
 
-	fmt.Println("===============================================")
-	fmt.Println("request inquiry", request)
+	if !isValid {
+		services.WriteLog(
+			"[inquiry-transfer-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due invalid login or expired",
+		})
+		return
+	}
 
-	fmt.Println("===============================================")
-	PostToAPIInquiry(request)
+	//--> API REQUEST PROCESS
+	request := models.InquiryTransfer{}
+	if err = c.ShouldBindJSON(&request); err != nil {
+		services.WriteLog(
+			"[inquiry-transfer-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
+		return
+	}
 
-	dataResponse := PostToAPIInquiry(request)
+	err = db.GetDB().Create(&request).Error
+	if err != nil {
+		services.WriteLog(
+			"[inquiry-transfer-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+		c.AbortWithError(http.StatusInternalServerError, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
+		return
+	}
 
+	reqApiTime, dataResponse, err := PostToAPIInquiry(request)
+	if err != nil {
+		services.WriteLog(
+			"[inquiry-transfer-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+		c.AbortWithError(http.StatusInternalServerError, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
+		return
+
+	}
+	services.WriteLog(
+		"[inquiry-transfer-done]", 
+		fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+			time.Since(startTime).Milliseconds()-reqApiTime, 
+			reqApiTime,
+			time.Since(startTime).Milliseconds()),
+		inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 	c.JSON(http.StatusCreated, dataResponse)
-
 }
 
-func PostToAPIInquiry(dataInquiry models.InquiryTransfer) map[string]interface{} {
-
+func PostToAPIInquiry(dataInquiry models.InquiryTransfer) (int64, map[string]interface{}, error) {
+	start := time.Now()
 	data := map[string]interface{}{
 		"accountNo":   dataInquiry.AccountNo,
 		"referenceId": dataInquiry.ReferenceId,
@@ -48,41 +124,28 @@ func PostToAPIInquiry(dataInquiry models.InquiryTransfer) map[string]interface{}
 
 	requestJson, err := json.Marshal(data)
 	if err != nil {
-		log.Fatal(err)
+		return 0, nil, err
 	}
-	client := &http.Client{}
 
-	request, err := http.NewRequest("POST", "https://apidev.banksinarmas.com/internal/transactions/transfer/v2.0/inquiry", bytes.NewBuffer(requestJson))
-
-	request.Header.Set("Content-type", "application/json")
-	request.Header.Set("x-gateway-apikey", "97817cac-d589-4d9c-b9bf-a874f0ff943d")
-
+	body, err := services.ConsumeAPIService("inquirytransfer", requestJson)
 	if err != nil {
-		log.Fatalln(err)
-	}
-	response, err := client.Do(request)
-	if err != nil {
-		log.Fatalln(err)
-
-	}
-	defer response.Body.Close()
-
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatalln(err)
+		return 0, nil, err
 	}
 
 	var dataResponse map[string]interface{}
 	err = json.Unmarshal(body, &dataResponse)
 
-	// Check your errors!
 	if err != nil {
-		log.Fatal(err.Error())
+		return 0, nil, err
 	}
 
-	fmt.Println("===============================================")
-
-	fmt.Println(string(body))
-	return dataResponse
-
+	dst := &bytes.Buffer{}
+	if err := json.Compact(dst, body); err != nil {
+		return 0, nil, err
+	}
+	services.WriteLog(
+		"[inquiry-transfer-report]", 
+		dst.String(),
+		inits.Cfg.LogPerformancePath+services.LogFileName,"report")
+	return time.Since(start).Milliseconds(),dataResponse, nil
 }

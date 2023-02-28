@@ -4,45 +4,122 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"teller/db"
+	"teller/inits"
 	"teller/models"
+	"teller/services"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func PostAdvice(c *gin.Context) {
+	startTime := time.Now()
+	var reqApiTime int64 = 0
+	var isValid bool = false
+	var err error
+
+	//--> TOKEN VALIDATION REQUEST
+	isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
+	if err != nil {
+		services.WriteLog(
+			"[advice-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
+		return
+	}
+
+	if !isValid {
+		services.WriteLog(
+			"[advice-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due invalid login or expired",
+		})
+		return
+	}
+
+	//--> API REQUEST PROCESS
 	request := models.Advice{}
 
-	if err := c.ShouldBindJSON(&request); err != nil {
+	if err = c.ShouldBindJSON(&request); err != nil {
+		services.WriteLog(
+			"[advice-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
 		return
 	}
 
-	err := db.GetDB().Debug().Create(&request).Error
+	err = db.GetDB().Create(&request).Error
 	if err != nil {
+		services.WriteLog(
+			"[advice-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 		c.AbortWithError(http.StatusInternalServerError, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
 		return
 	}
 
-	fmt.Println("===============================================")
-	fmt.Println("request internal", request)
+	reqApiTime, dataResponse, err := PostToAPIAdvice(request)
+	if err != nil {
+		services.WriteLog(
+			"[advice-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+		c.AbortWithError(http.StatusInternalServerError, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
+		return
 
-	fmt.Println("===============================================")
-	PostToAPIAdvice(request)
+	}
 
-	dataResponse := PostToAPIAdvice(request)
-
+	services.WriteLog(
+		"[advice-done]", 
+		fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+			time.Since(startTime).Milliseconds()-reqApiTime, 
+			reqApiTime,
+			time.Since(startTime).Milliseconds()),
+		inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 	c.JSON(http.StatusCreated, dataResponse)
-
 }
 
-func PostToAPIAdvice(dataAdvice models.Advice) map[string]interface{} {
-
+func PostToAPIAdvice(dataAdvice models.Advice) (int64, map[string]interface{}, error) {
+	start := time.Now()
 	data := map[string]interface{}{
-
 		"referenceId":         dataAdvice.ReferenceId,
 		"debitAccountNo":      dataAdvice.DebitAccountNo,
 		"creditAccountNo":     dataAdvice.CreditAccountNo,
@@ -54,41 +131,28 @@ func PostToAPIAdvice(dataAdvice models.Advice) map[string]interface{} {
 
 	requestJson, err := json.Marshal(data)
 	if err != nil {
-		log.Fatal(err)
+		return 0, nil, err
 	}
-	client := &http.Client{}
 
-	request, err := http.NewRequest("POST", "https://apidev.banksinarmas.com/internal/transactions/transfer/v2.0/advice", bytes.NewBuffer(requestJson))
-
-	request.Header.Set("Content-type", "application/json")
-	request.Header.Set("x-gateway-apikey", "97817cac-d589-4d9c-b9bf-a874f0ff943d")
-
+	body, err := services.ConsumeAPIService("advice", requestJson)
 	if err != nil {
-		log.Fatalln(err)
-	}
-	response, err := client.Do(request)
-	if err != nil {
-		log.Fatalln(err)
-
-	}
-	defer response.Body.Close()
-
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatalln(err)
+		return 0, nil, err
 	}
 
 	var dataResponse map[string]interface{}
 	err = json.Unmarshal(body, &dataResponse)
 
-	// Check your errors!
 	if err != nil {
-		log.Fatal(err.Error())
+		return 0, nil, err
 	}
 
-	fmt.Println("===============================================")
-
-	fmt.Println(string(body))
-	return dataResponse
-
+	dst := &bytes.Buffer{}
+	if err := json.Compact(dst, body); err != nil {
+		return 0, nil, err
+	}
+	services.WriteLog(
+		"[advice-report]", 
+		dst.String(),
+		inits.Cfg.LogPerformancePath+services.LogFileName,"report")
+	return time.Since(start).Milliseconds(),dataResponse, nil
 }

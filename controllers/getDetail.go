@@ -4,43 +4,120 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"teller/db"
+	"teller/inits"
 	"teller/models"
+	"teller/services"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func PostGetDetail(c *gin.Context) {
+	startTime := time.Now()
+	var reqApiTime int64 = 0
+	var isValid bool = false
+	var err error
+
+	//--> TOKEN VALIDATION REQUEST
+	isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
+	if err != nil {
+		services.WriteLog(
+			"[get-detail-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
+		return
+	}
+
+	if !isValid {
+		services.WriteLog(
+			"[get-detail-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due invalid login or expired",
+		})
+		return
+	}
+
+	//--> API REQUEST PROCESS
 	request := models.GetDetail{}
 
-	if err := c.ShouldBindJSON(&request); err != nil {
+	if err = c.ShouldBindJSON(&request); err != nil {
+		services.WriteLog(
+			"[get-detail-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
 		return
 	}
 
-	err := db.GetDB().Debug().Create(&request).Error
+	err = db.GetDB().Create(&request).Error
 	if err != nil {
+		services.WriteLog(
+			"[get-detail-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 		c.AbortWithError(http.StatusInternalServerError, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
 		return
 	}
 
-	fmt.Println("===============================================")
-	fmt.Println("request inquiry", request)
+	reqApiTime, dataResponse, err := PostToAPIGetDetail(request)
+	if err != nil {
+		services.WriteLog(
+			"[get-detail-fail]", 
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-reqApiTime, 
+				reqApiTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+		c.AbortWithError(http.StatusInternalServerError, err)
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "unable to precess due" + err.Error(),
+		})
+		return
 
-	fmt.Println("===============================================")
-	PostToAPIGetDetail(request)
-
-	dataResponse := PostToAPIGetDetail(request)
-
+	}
+	services.WriteLog(
+		"[get-detail-done]", 
+		fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+			time.Since(startTime).Milliseconds()-reqApiTime, 
+			reqApiTime,
+			time.Since(startTime).Milliseconds()),
+		inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
 	c.JSON(http.StatusCreated, dataResponse)
-
 }
 
-func PostToAPIGetDetail(dataGetDetail models.GetDetail) map[string]interface{} {
-
+func PostToAPIGetDetail(dataGetDetail models.GetDetail) (int64, map[string]interface{}, error) {
+	start := time.Now()
 	data := map[string]interface{}{
 		"transactionID": dataGetDetail.TransactionID,
 		"accountNumber": dataGetDetail.AccountNumber,
@@ -48,41 +125,28 @@ func PostToAPIGetDetail(dataGetDetail models.GetDetail) map[string]interface{} {
 
 	requestJson, err := json.Marshal(data)
 	if err != nil {
-		log.Fatal(err)
+		return 0, nil, err
 	}
-	client := &http.Client{}
 
-	request, err := http.NewRequest("POST", "https://apidev.banksinarmas.com/internal/accounts/management/v2.0/getDetail", bytes.NewBuffer(requestJson))
-
-	request.Header.Set("Content-type", "application/json")
-	request.Header.Set("x-gateway-apikey", "97817cac-d589-4d9c-b9bf-a874f0ff943d")
-
+	body, err := services.ConsumeAPIService("getdetail", requestJson)
 	if err != nil {
-		log.Fatalln(err)
-	}
-	response, err := client.Do(request)
-	if err != nil {
-		log.Fatalln(err)
-
-	}
-	defer response.Body.Close()
-
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatalln(err)
+		return 0, nil, err
 	}
 
 	var dataResponse map[string]interface{}
 	err = json.Unmarshal(body, &dataResponse)
 
-	// Check your errors!
 	if err != nil {
-		log.Fatal(err.Error())
+		return 0, nil, err
 	}
 
-	fmt.Println("===============================================")
-
-	fmt.Println(string(body))
-	return dataResponse
-
+	dst := &bytes.Buffer{}
+	if err := json.Compact(dst, body); err != nil {
+		return 0, nil, err
+	}
+	services.WriteLog(
+		"[get-detail-report]", 
+		dst.String(),
+		inits.Cfg.LogPerformancePath+services.LogFileName,"report")
+	return time.Since(start).Milliseconds(),dataResponse, nil
 }

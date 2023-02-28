@@ -8,6 +8,13 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+/**
+ * @author [Fajar Dwi Nur Racmadi]
+ * @email [fajar.d.rachmadi@banksinarmas.com]
+ * @create date 2023-02-14
+ * @modify date 2023-02-20
+ * @desc [description]
+ */
 func GenerateToken(userLogin models.SignInInput, secretJWTKey string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
@@ -15,14 +22,6 @@ func GenerateToken(userLogin models.SignInInput, secretJWTKey string) (string, e
 	claims["exp"] = time.Now().Add(10 * time.Minute)
 	claims["authorized"] = true
 	claims["user"] = "username"
-
-	// now := time.Now().UTC()
-	// claims := token.Claims.(jwt.MapClaims)
-
-	// claims["sub"] = payload
-	// claims["exp"] = now.Add(ttl).Unix()
-	// claims["iat"] = now.Unix()
-	// claims["nbf"] = now.Unix()
 
 	tokenString, err := token.SignedString([]byte(secretJWTKey))
 

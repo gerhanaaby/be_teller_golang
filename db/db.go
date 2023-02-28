@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"os"
+	"teller/inits"
 	"teller/models"
 
 	"gorm.io/driver/postgres"
@@ -14,26 +14,29 @@ var (
 	err error
 )
 
-func ConnectDB()  error {
+func ConnectDB() error {
+
 	models.ApiMap = make(map[string]models.Apis)
 
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", 
-			os.Getenv(`PSQL_HOST`),
-			os.Getenv(`PSQL_PORT`),
-			os.Getenv(`PSQL_USER`),
-			os.Getenv(`PSQL_PASS`),
-			os.Getenv(`PSQL_DBNAME`))
-	db, err = gorm.Open(postgres.Open(psqlInfo), &gorm.Config{})
-	if err != nil {
+	if db, err = gorm.Open(
+		postgres.Open(
+			fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", 
+			inits.Cfg.DBHost,
+			inits.Cfg.DBPort,
+			inits.Cfg.DBUserName,
+			inits.Cfg.DBUserPassword,
+			inits.Cfg.DBName)), &gorm.Config{}); err != nil {
 		return err
 	}
 
 	db.AutoMigrate(&models.User{}, &models.Skn{}, &models.Apis{}, &models.InquiryTransfer{}, &models.InternalTransfer{},
 		&models.GetDetail{}, &models.Advice{})
     
-	if err = db.Debug().Raw("SELECT * FROM apis").Scan(&models.ApiList).Error; err != nil  {
+	if err = db.Table(`apis`).Scan(&models.ApiList).Error; err != nil  {
 		return err
 	}
+	fmt.Println(models.ApiList[0].Name)
+	fmt.Println(models.ApiList[1].Name)
 
 	for _, api := range models.ApiList{
 		models.ApiMap[api.Name] = api

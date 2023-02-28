@@ -2,14 +2,20 @@ package services
 
 import (
 	"errors"
-	"os"
 	"strings"
+	"teller/inits"
 
 	"github.com/golang-jwt/jwt/v4"
 )
 
-
-type Claims struct {
+/**
+ * @author [Fajar Dwi Nur Racmadi]
+ * @email [fajar.d.rachmadi@banksinarmas.com]
+ * @create date 2023-02-14
+ * @modify date 2023-02-20
+ * @desc [Cek Keabsahan token pada jwt session]
+ */
+ type Claims struct {
 	Username string `json:"username"`
 	jwt.RegisteredClaims
 }
@@ -35,6 +41,7 @@ func CheckToken(reqToken string) (bool, error) {
 	return true, nil
 }
 
+
 func ValidateToken(reqToken string) (bool, error) {
 	if reqToken == ""{
 		return false, errors.New("empty token")
@@ -45,7 +52,7 @@ func ValidateToken(reqToken string) (bool, error) {
 	claims := &Claims{}
 
 	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("TOKEN_SECRET")), nil
+		return []byte(inits.Cfg.TokenSecret), nil
 	})
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
