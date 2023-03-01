@@ -21,7 +21,13 @@ func Routes() {
 	UserRoutes := r.Group("user")
 	{
 
-		UserRoutes.POST("/auth/login", controllers.UserLoginController)
+		// UserRoutes.POST("/auth/login", controllers.UserLoginController)
+		UserRoutes.POST("/create", controllers.CreateUser)
+
+		UserAuthRoutes := UserRoutes.Group("auth")
+		{
+			UserAuthRoutes.POST("/login", controllers.UserLoginController)
+		}
 
 		UserTransRoutes := UserRoutes.Group("transac")
 		{
@@ -42,8 +48,6 @@ func Routes() {
 			UserUtilityRoutes.GET("/getb64/:cif", controllers.GetBase64ByCif)
 		}
 	}
-
-
 
 	r.Run(":5000")
 }

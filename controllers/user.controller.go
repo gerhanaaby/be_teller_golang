@@ -9,7 +9,9 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
+	"teller/db"
 	"teller/models"
 	"teller/services"
 
@@ -71,7 +73,68 @@ func UserLoginController(c *gin.Context) {
 	})
 }
 
+func CreateUser(c *gin.Context) {
+	var err error
 
+	request := models.User{}
+	if err = c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "error, "+err.Error(),
+		})
+		return
+	}
+
+	if len(request.Username) < 8 || len(request.Username) > 15 {
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "error, username min 8 and max 15 character",
+		})
+		return 
+	}
+
+	if len(request.Password) < 8 || len(request.Password) > 15 {
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "error, password min 8 and max 15 character",
+		})
+		return 
+	}
+
+	if len(request.Nik) > 6 || len(request.Nik) < 6 {
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "error, NIK must exact 6 character",
+		})
+		return
+	}
+
+	request.Password, err = services.HashPassword(request.Password)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "error, "+err.Error(),
+		})
+		return 
+	}
+
+	err = db.GetDB().Create(&request).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, AuthStatus{
+			Status:  "Fail",
+			Message: "error, "+err.Error(),
+		})
+		return
+	}
+
+	fmt.Println(request)
+
+	c.JSON(http.StatusOK, AuthStatus{
+		Status:  "Success",
+		Message: "user successfully created",
+	})
+
+}
 // func RefreshToken(c *gin.Context) {
 // 	reqToken := c.Request.Header.Get("Authorization")
 // 	if reqToken == ""{
