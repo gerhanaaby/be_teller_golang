@@ -106,8 +106,8 @@ func PostInternalTransfer(c *gin.Context) {
 
 	}
 
-	logTransaction := dataResponse["$errorInfo"].(map[string]interface{})["$pipeline"].(map[string]interface{})["logTransaction"]
-	inputMessage := dataResponse["$errorInfo"].(map[string]interface{})["$pipeline"].(map[string]interface{})["inputMessage"]
+	// logTransaction := dataResponse["$errorInfo"].(map[string]interface{})["$pipeline"].(map[string]interface{})["logTransaction"]
+	// inputMessage := dataResponse["$errorInfo"].(map[string]interface{})["$pipeline"].(map[string]interface{})["inputMessage"]
 
 	services.WriteLog(
 		"[internal-transfer-done]",
@@ -117,10 +117,11 @@ func PostInternalTransfer(c *gin.Context) {
 			time.Since(startTime).Milliseconds()),
 		inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 
-	c.JSON(http.StatusCreated, gin.H{
-		"logTransaction": logTransaction,
-		"inputMessage":   inputMessage,
-	})
+	// c.JSON(http.StatusCreated, gin.H{
+	// 	"logTransaction": logTransaction,
+	// 	"inputMessage":   inputMessage,
+	// })
+	c.JSON(http.StatusCreated, dataResponse)
 }
 
 func PostToAPIInternal(dataInternal models.InternalTransfer) (int64, map[string]interface{}, error) {
