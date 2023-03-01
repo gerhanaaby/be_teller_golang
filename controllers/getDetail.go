@@ -21,15 +21,15 @@ func PostGetDetail(c *gin.Context) {
 	var err error
 
 	//--> TOKEN VALIDATION REQUEST
-	_,isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
+	_, isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
 		services.WriteLog(
-			"[get-detail-fail]", 
+			"[get-detail-fail]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
+				time.Since(startTime).Milliseconds()-reqApiTime,
 				reqApiTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status:  "Fail",
@@ -40,12 +40,12 @@ func PostGetDetail(c *gin.Context) {
 
 	if !isValid {
 		services.WriteLog(
-			"[get-detail-fail]", 
+			"[get-detail-fail]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
+				time.Since(startTime).Milliseconds()-reqApiTime,
 				reqApiTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status:  "Fail",
 			Message: "unable to precess due invalid login or expired",
@@ -58,12 +58,12 @@ func PostGetDetail(c *gin.Context) {
 
 	if err = c.ShouldBindJSON(&request); err != nil {
 		services.WriteLog(
-			"[get-detail-fail]", 
+			"[get-detail-fail]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
+				time.Since(startTime).Milliseconds()-reqApiTime,
 				reqApiTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.AbortWithError(http.StatusBadRequest, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status:  "Fail",
@@ -75,12 +75,12 @@ func PostGetDetail(c *gin.Context) {
 	err = db.GetDB().Create(&request).Error
 	if err != nil {
 		services.WriteLog(
-			"[get-detail-fail]", 
+			"[get-detail-fail]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
+				time.Since(startTime).Milliseconds()-reqApiTime,
 				reqApiTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status:  "Fail",
@@ -92,12 +92,12 @@ func PostGetDetail(c *gin.Context) {
 	reqApiTime, dataResponse, err := PostToAPIGetDetail(request)
 	if err != nil {
 		services.WriteLog(
-			"[get-detail-fail]", 
+			"[get-detail-fail]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
+				time.Since(startTime).Milliseconds()-reqApiTime,
 				reqApiTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status:  "Fail",
@@ -107,12 +107,12 @@ func PostGetDetail(c *gin.Context) {
 
 	}
 	services.WriteLog(
-		"[get-detail-done]", 
+		"[get-detail-done]",
 		fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-			time.Since(startTime).Milliseconds()-reqApiTime, 
+			time.Since(startTime).Milliseconds()-reqApiTime,
 			reqApiTime,
 			time.Since(startTime).Milliseconds()),
-		inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+		inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 	c.JSON(http.StatusCreated, dataResponse)
 }
 
@@ -145,8 +145,8 @@ func PostToAPIGetDetail(dataGetDetail models.GetDetail) (int64, map[string]inter
 		return 0, nil, err
 	}
 	services.WriteLog(
-		"[get-detail-report]", 
+		"[get-detail-report]",
 		dst.String(),
-		inits.Cfg.LogReportPath+services.LogFileName,"report")
-	return time.Since(start).Milliseconds(),dataResponse, nil
+		inits.Cfg.LogReportPath+services.LogFileName, "report")
+	return time.Since(start).Milliseconds(), dataResponse, nil
 }
