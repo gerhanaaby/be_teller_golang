@@ -28,14 +28,15 @@ func Login(user models.SignInInput) (string, error) {
 	}
 
 	if result.Name == `` {
-		return ``, errors.New("user")
+		return ``, errors.New("error, invalid user")
 
 	}
 
 	expirationTime := time.Now().Add(12 * time.Hour)
 
 	claims := &Claims{
-		Username: user.Username,
+		User: result,
+		// Username: result.Username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},
@@ -49,4 +50,5 @@ func Login(user models.SignInInput) (string, error) {
 	}
 
 	return tokenString, nil
+
 }

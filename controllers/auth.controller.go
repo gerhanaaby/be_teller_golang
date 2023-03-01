@@ -1,114 +1,140 @@
 package controllers
 
 // import (
+// 	"fmt"
 // 	"net/http"
-// 	"strings"
-// 	"teller/inits"
-// 	"teller/models"
-// 	"teller/utils"
 // 	"time"
 
 // 	"github.com/gin-gonic/gin"
-// 	"github.com/thanhpk/randstr"
-
-// 	// "github.com/wpcodevo/golang-gorm-postgres/initializers"
-
-// 	// "github.com/wpcodevo/golang-gorm-postgres/models"
-
-// 	// "github.com/wpcodevo/golang-gorm-postgres/utils"
-// 	"gorm.io/gorm"
 // )
 
-/**
- * @author [Fajar Dwi Nur Racmadi]
- * @email [fajar.d.rachmadi@banksinarmas.com]
- * @create date 2023-02-14
- * @modify date 2023-02-20
- * @desc [Create Account, Verify Account]
- */
-// type AuthController struct {
-// 	DB *gorm.DB
-// }
+// // import (
+// // 	"net/http"
+// // 	"strings"
+// // 	"teller/inits"
+// // 	"teller/models"
+// // 	"teller/utils"
+// // 	"time"
 
-// func NewAuthController(DB *gorm.DB) AuthController {
-// 	return AuthController{DB}
-// }
+// // 	"github.com/gin-gonic/gin"
+// // 	"github.com/thanhpk/randstr"
 
-// // [...] SignUp User
-// func (ac *AuthController) SignUpUser(ctx *gin.Context) {
-// 	var payload *models.SignUpInput
+// // 	// "github.com/wpcodevo/golang-gorm-postgres/initializers"
 
-// 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-// 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
-// 		return
-// 	}
+// // 	// "github.com/wpcodevo/golang-gorm-postgres/models"
 
-// 	if payload.Password != payload.PasswordConfirm {
-// 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Passwords do not match"})
-// 		return
-// 	}
+// // 	// "github.com/wpcodevo/golang-gorm-postgres/utils"
+// // 	"gorm.io/gorm"
+// // )
 
-// 	hashedPassword, err := utils.HashPassword(payload.Password)
-// 	if err != nil {
-// 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": err.Error()})
-// 		return
-// 	}
+// /**
+//  * @author [Fajar Dwi Nur Racmadi]
+//  * @email [fajar.d.rachmadi@banksinarmas.com]
+//  * @create date 2023-02-14
+//  * @modify date 2023-02-20
+//  * @desc [Create Account, Verify Account]
+//  */
+// // type AuthController struct {
+// // 	DB *gorm.DB
+// // }
 
-// 	now := time.Now()
-// 	newUser := models.User{
-// 		Name:      payload.Name,
-// 		Email:     strings.ToLower(payload.Email),
-// 		Password:  hashedPassword,
-// 		Roles:      "user",
-// 		Division:  "local",
-// 		Verified:  false,
-// 		Photo:     payload.Photo,
-// 		CreatedAt: now,
-// 		UpdatedAt: now,
-// 	}
+// // func NewAuthController(DB *gorm.DB) AuthController {
+// // 	return AuthController{DB}
+// // }
 
-// 	result := ac.DB.Create(&newUser)
+// // // [...] SignUp User
+// // func (ac *AuthController) SignUpUser(ctx *gin.Context) {
+// // 	var payload *models.SignUpInput
 
-// 	if result.Error != nil && strings.Contains(result.Error.Error(), "duplicate key value violates unique") {
-// 		ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "User with that email already exists"})
-// 		return
-// 	} else if result.Error != nil {
-// 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": "Something bad happened"})
-// 		return
-// 	}
+// // 	if err := ctx.ShouldBindJSON(&payload); err != nil {
+// // 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+// // 		return
+// // 	}
 
-// 	// config, _ := inits.LoadConfig(".")
+// // 	if payload.Password != payload.PasswordConfirm {
+// // 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Passwords do not match"})
+// // 		return
+// // 	}
 
-// 	// Generate Verification Code
-// 	code := randstr.String(20)
+// // 	hashedPassword, err := utils.HashPassword(payload.Password)
+// // 	if err != nil {
+// // 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": err.Error()})
+// // 		return
+// // 	}
 
-// 	verification_code := utils.Encode(code)
+// // 	now := time.Now()
+// // 	newUser := models.User{
+// // 		Name:      payload.Name,
+// // 		Email:     strings.ToLower(payload.Email),
+// // 		Password:  hashedPassword,
+// // 		Roles:      "user",
+// // 		Division:  "local",
+// // 		Verified:  false,
+// // 		Photo:     payload.Photo,
+// // 		CreatedAt: now,
+// // 		UpdatedAt: now,
+// // 	}
 
-// 	// Update User in Database
-// 	newUser.VerificationCode = verification_code
-// 	ac.DB.Save(newUser)
+// // 	result := ac.DB.Create(&newUser)
 
-// 	var firstName = newUser.Name
+// // 	if result.Error != nil && strings.Contains(result.Error.Error(), "duplicate key value violates unique") {
+// // 		ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "User with that email already exists"})
+// // 		return
+// // 	} else if result.Error != nil {
+// // 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": "Something bad happened"})
+// // 		return
+// // 	}
 
-// 	if strings.Contains(firstName, " ") {
-// 		firstName = strings.Split(firstName, " ")[1]
-// 	}
+// // 	// config, _ := inits.LoadConfig(".")
 
-// 	// ? Send Email
-// 	emailData := utils.EmailData{
-// 		URL:       config.ClientOrigin + "/verifyemail/" + code,
-// 		FirstName: firstName,
-// 		Subject:   "Your account verification code",
-// 	}
+// // 	// Generate Verification Code
+// // 	code := randstr.String(20)
 
-// 	utils.SendEmail(&newUser, &emailData)
+// // 	verification_code := utils.Encode(code)
 
-// 	message := "We sent an email with a verification code to " + newUser.Email
-// 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "message": message})
-// }
+// // 	// Update User in Database
+// // 	newUser.VerificationCode = verification_code
+// // 	ac.DB.Save(newUser)
+
+// // 	var firstName = newUser.Name
+
+// // 	if strings.Contains(firstName, " ") {
+// // 		firstName = strings.Split(firstName, " ")[1]
+// // 	}
+
+// // 	// ? Send Email
+// // 	emailData := utils.EmailData{
+// // 		URL:       config.ClientOrigin + "/verifyemail/" + code,
+// // 		FirstName: firstName,
+// // 		Subject:   "Your account verification code",
+// // 	}
+
+// // 	utils.SendEmail(&newUser, &emailData)
+
+// // 	message := "We sent an email with a verification code to " + newUser.Email
+// // 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "message": message})
+// // }
 
 // // [...] SignOut User
 // func (ac *AuthController) LogoutUser(ctx *gin.Context) {
+
+// 	if GlobalCorsEnabled {
+// 		enableCors(&w)
+// 	}
+
+// 	tkn, failedAuth := CheckJwtAuth(w, r)
+// 	if failedAuth {
+// 		return
+// 	}
+
+// 	//remove old token from list
+// 	whiteListTokens = remove(whiteListTokens, tkn.Raw)
+
+// 	w.Write([]byte(fmt.Sprintf("LoggedOut")))
+
 // 	ctx.SetCookie("token", "", -1, "/", "localhost", false, true)
 // 	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
+
+// time.Now().UnixMicro()
+
 // }

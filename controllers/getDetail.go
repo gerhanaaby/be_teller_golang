@@ -21,7 +21,7 @@ func PostGetDetail(c *gin.Context) {
 	var err error
 
 	//--> TOKEN VALIDATION REQUEST
-	isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
+	_,isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
 		services.WriteLog(
 			"[get-detail-fail]", 
@@ -147,6 +147,6 @@ func PostToAPIGetDetail(dataGetDetail models.GetDetail) (int64, map[string]inter
 	services.WriteLog(
 		"[get-detail-report]", 
 		dst.String(),
-		inits.Cfg.LogPerformancePath+services.LogFileName,"report")
+		inits.Cfg.LogReportPath+services.LogFileName,"report")
 	return time.Since(start).Milliseconds(),dataResponse, nil
 }

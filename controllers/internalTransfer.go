@@ -21,7 +21,7 @@ func PostInternalTransfer(c *gin.Context) {
 	var err error
 
 	//--> TOKEN VALIDATION REQUEST
-	isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
+	_,isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
 		services.WriteLog(
 			"[internal-transfer-fail]", 
@@ -160,6 +160,6 @@ func PostToAPIInternal(dataInternal models.InternalTransfer) (int64, map[string]
 	services.WriteLog(
 		"[internal-transfer-report]", 
 		dst.String(),
-		inits.Cfg.LogPerformancePath+services.LogFileName,"report")
+		inits.Cfg.LogReportPath+services.LogFileName,"report")
 		return time.Since(start).Milliseconds(),dataResponse, nil
 	}

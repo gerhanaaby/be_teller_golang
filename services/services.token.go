@@ -2,8 +2,10 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"teller/inits"
+	"teller/models"
 
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -16,53 +18,62 @@ import (
  * @desc [Cek Keabsahan token pada jwt session]
  */
  type Claims struct {
-	Username string `json:"username"`
+	User	models.User `josn:"User"`
 	jwt.RegisteredClaims
 }
 
-func CheckToken(reqToken string) (bool, error) {
-	var isValid bool
-	var err error
+func CheckToken(reqToken string) (claims jwt.MapClaims, isValid bool, err error) {
 
 	if reqToken == "" {
-		return false, errors.New("error, empty token")
+		return claims, false, errors.New("error, empty token")
 	}
 
-	token := strings.Replace(reqToken, "Bearer ", "", 1)
-
-	if isValid, err = ValidateToken(token); err != nil {
-		return false, err
-	}
-
-	if !isValid {
-		return false, errors.New("unable to precess due to invalid or expired login")
-	}
-
-	return true, nil
-}
-
-
-func ValidateToken(reqToken string) (bool, error) {
-	if reqToken == ""{
-		return false, errors.New("empty token")
-	}
-	
-	token := strings.Replace(reqToken, "Bearer ", "", 1)
-
-	claims := &Claims{}
-
-	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(inits.Cfg.TokenSecret), nil
-	})
+	token, err := jwt.Parse(
+		strings.Replace(reqToken, "Bearer ", "", 1),
+		 func(token *jwt.Token) (interface{}, error) {
+			return []byte(inits.Cfg.TokenSecret), nil
+		})
 	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-		return false, errors.New("invalid token")
-		}
-		return false, errors.New("invalid token")
+		return nil, false, err
 	}
-	if !tkn.Valid {
-		return false, errors.New("invalid token")
+	_,a := token.Claims.(jwt.MapClaims)
+	if !a {
+		fmt.Println()
 	}
 
-	return true, nil
+	if claims, ok  := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		claims.VerifyExpiresAt(0, true)
+		return claims, true, nil
+	} else {
+		return claims, false, errors.New("invalid JWT Token")
+	}
 }
+
+
+// func ValidateToken(reqToken string, claims Claims) (models.User, bool, error) {
+
+// 	token, err := jwt.ParseWithClaims(
+// 		reqToken, 
+// 		claims, 
+// 		func(reqToken *jwt.Token) (interface{}, error) {
+// 			return []byte(inits.Cfg.TokenSecret), nil
+// 		})
+// 	if err != nil {
+// 		if err == jwt.ErrSignatureInvalid {
+// 			return nil, false, errors.New("invalid token")
+// 		}
+// 		return false, errors.New("invalid token")
+// 	}
+// 	if !token.Valid {
+// 		return false, errors.New("invalid token")
+// 	}
+
+// 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+// 		return claims, true
+// 	} else {
+// 		log.Printf("Invalid JWT Token")
+// 		return nil, false
+// 	}
+
+// 	return true, nil
+// }
