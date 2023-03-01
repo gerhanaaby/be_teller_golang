@@ -125,7 +125,7 @@ func PostToAPIInquiry(dataInquiry models.InquiryTransfer) (int64, map[string]int
 		return 0, nil, err
 	}
 	services.WriteLog(
-		"[skn-report]",
+		"[inquirytransfer-report]",
 		dst.String(),
 		inits.Cfg.LogReportPath+services.LogFileName, "report")
 	return time.Since(start).Milliseconds(), dataResponse, nil

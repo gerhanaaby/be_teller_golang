@@ -130,7 +130,7 @@ func PostToAPIAdvice(dataAdvice models.Advice) (int64, map[string]interface{}, e
 		return 0, nil, err
 	}
 	services.WriteLog(
-		"[skn-report]",
+		"[advice-report]",
 		dst.String(),
 		inits.Cfg.LogReportPath+services.LogFileName, "report")
 	return time.Since(start).Milliseconds(), dataResponse, nil
