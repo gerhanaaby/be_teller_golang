@@ -109,14 +109,16 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	request.Password, err = services.HashPassword(request.Password)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status:  "Fail",
-			Message: "error, "+err.Error(),
-		})
-		return 
-	}
+	// request.Password, err = services.HashPassword(request.Password)
+	// if err != nil {
+	// 	c.JSON(http.StatusBadRequest, AuthStatus{
+	// 		Status:  "Fail",
+	// 		Message: "error, "+err.Error(),
+	// 	})
+	// 	return 
+	// }
+
+	request.Password = services.GetMD5Hash(request.Password)
 
 	err = db.GetDB().Create(&request).Error
 	if err != nil {

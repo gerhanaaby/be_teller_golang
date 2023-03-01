@@ -40,7 +40,7 @@ func Routes() {
 
 		UserNsbRoutes := UserRoutes.Group("nasabah") 
 		{
-			UserNsbRoutes.GET("/:cif", controllers.GetNasabahByCIF)
+			UserNsbRoutes.GET("/:cif/get", controllers.GetNasabahByCIF)
 		}
 
 		UserUtilityRoutes := UserRoutes.Group("utils")
