@@ -12,7 +12,7 @@ import "gorm.io/gorm"
  type Nasabah struct {
 	gorm.Model
 	 
-	// ID           		    int64   `json:"userid" gorm:"type:serial;primary_key"`
+	 ID           		    int64   `json:"userid" gorm:"type:serial;primary_key"`
 	 CIF                    string  `gorm:" column:CIF;type:varchar(256); null"`
 	 Nama                   string  `gorm:" column:Nama;type:varchar(200); null"`
 	 Tipe                   string  `gorm:" column:Tipe;type:varchar(200); null"`
@@ -76,13 +76,13 @@ import "gorm.io/gorm"
 	 OfficeAddress          string  `gorm:" column:officeAddress;type:varchar(200); null"`
 	 OfficePostcode         string  `gorm:" column:officePostcode;type:varchar(200); null"`
 	 SupervisorId           string  `gorm:" column:supervisorId;type:varchar(200); null"`
-	 Lastchange             string  `gorm:" column:lastchange;type:varchar(256); null"`
+	 Lastchange             int64   `gorm:" column:lastchange;type:timestamp without time zone; null"`
 	 Terminalid             string  `gorm:" column:terminalid;type:varchar(200); null"`
-	 IDExpiryDate           string  `gorm:" column:IDExpiryDate;type:varchar(256); null"`
-	 CreationDate           string  `gorm:" column:CreationDate;type:varchar(256); null"`
-	 TanggalLahir           string  `gorm:" column:TanggalLahir;type:varchar(256); null"`
+	 IDExpiryDate           int64   `gorm:" column:IDExpiryDate;type:timestamp without time zone; null"`
+	 CreationDate           int64   `gorm:" column:CreationDate;type:timestamp without time zone; null"`
+	 TanggalLahir           int64   `gorm:" column:TanggalLahir;type:timestamp without time zone; null"`
 	 Npwp                   string  `gorm:" column:npwp;type:varchar(200); null"`
-	 DomisiliDate           string  `gorm:" column:domisiliDate;type:varchar(256); null"`
+	 DomisiliDate           int64   `gorm:" column:domisiliDate;type:timestamp without time zone; null"`
 	 Streetname2            string  `gorm:" column:streetname2;type:varchar(200); null"`
 	 Pillar2                string  `gorm:" column:pillar2;type:varchar(200); null"`
 	 Village2               string  `gorm:" column:village2;type:varchar(200); null"`
@@ -111,7 +111,7 @@ import "gorm.io/gorm"
 	 Ref                    string  `gorm:" column:ref;type:varchar(200); null"`
 	 PhoneOffice            string  `gorm:" column:phoneOffice;type:varchar(200); null"`
 	 FaxOffice              string  `gorm:" column:faxOffice;type:varchar(200); null"`
-	 EmployeeDate           string  `gorm:" column:employeeDate;type:varchar(256); null"`
+	 EmployeeDate           int64   `gorm:" column:employeeDate;type:timestamp without time zone; null"`
 	 OtherBusiness          string  `gorm:" column:otherBusiness;type:varchar(200); null"`
 	 BeneficialJob          string  `gorm:" column:beneficialJob;type:varchar(200); null"`
 	 RelationCode1          string  `gorm:" column:relationCode1;type:varchar(200); null"`
@@ -123,7 +123,7 @@ import "gorm.io/gorm"
 	 Msgid                  string  `gorm:" column:msgid;type:varchar(200); null"`
 	 Trxid                  string  `gorm:" column:trxid;type:varchar(200); null"`
 	 CompanyEntity          string  `gorm:" column:companyEntity;type:varchar(200); null"`
-	 EstablishDate          string  `gorm:" column:establishDate;type:varchar(256); null"`
+	 EstablishDate          int64   `gorm:" column:establishDate;type:timestamp without time zone; null"`
 	 NamePic                string  `gorm:" column:namePic;type:varchar(200); null"`
 	 RegPlaceCD             string  `gorm:" column:regPlaceCD;type:varchar(200); null"`
 	 Info3                  string  `gorm:" column:info3;type:varchar(200); null"`
@@ -138,7 +138,7 @@ import "gorm.io/gorm"
 	 CompanyNumberCorp      string  `gorm:" column:companyNumberCorp;type:varchar(200); null"`
 	 MinistervalidCorp      string  `gorm:" column:ministervalidCorp;type:varchar(200); null"`
 	 GopublicCorp           string  `gorm:" column:gopublicCorp;type:varchar(200); null"`
-	 DateoccupiedCorp       string  `gorm:" column:dateoccupiedCorp;type:varchar(256); null"`
+	 DateoccupiedCorp       int64   `gorm:" column:dateoccupiedCorp;type:timestamp without time zone; null"`
 	 SidcodeCorp            string  `gorm:" column:sidcodeCorp;type:varchar(200); null"`
 	 LhbucodeCorp           string  `gorm:" column:lhbucodeCorp;type:varchar(200); null"`
 	 Bamepic1               string  `gorm:" column:namepic1;type:varchar(200); null"`
@@ -165,7 +165,7 @@ import "gorm.io/gorm"
 	 Address1               string  `gorm:" column:address1;type:varchar(200); null"`
 	 Idtype1                string  `gorm:" column:idtype1;type:varchar(200); null"`
 	 Idnumber1              string  `gorm:" column:idnumber1;type:varchar(200); null"`
-	 Idvalidto1             string  `gorm:" column:idvalidto1;type:varchar(256); null"`
+	 Idvalidto1             int64   `gorm:" column:idvalidto1;type:timestamp without time zone; null"`
 	 Mobileph1              string  `gorm:" column:mobileph1;type:varchar(200); null"`
 	 Gender1                string  `gorm:" column:gender1;type:varchar(200); null"`
 	 Npwp1                  string  `gorm:" column:npwp1;type:varchar(200); null"`
@@ -177,7 +177,7 @@ import "gorm.io/gorm"
 	 Address2               string  `gorm:" column:address2;type:varchar(200); null"`
 	 Idtype2                string  `gorm:" column:idtype2;type:varchar(200); null"`
 	 Idnumber2              string  `gorm:" column:idnumber2;type:varchar(200); null"`
-	 Idvalidto2             string  `gorm:" column:idvalidto2;type:varchar(256); null"`
+	 Idvalidto2             int64   `gorm:" column:idvalidto2;type:timestamp without time zone; null"`
 	 Mobileph2              string  `gorm:" column:mobileph2;type:varchar(200); null"`
 	 Gender2                string  `gorm:" column:gender2;type:varchar(200); null"`
 	 Npwp2                  string  `gorm:" column:npwp2;type:varchar(200); null"`
@@ -186,7 +186,7 @@ import "gorm.io/gorm"
 	 Address3               string  `gorm:" column:address3;type:varchar(200); null"`
 	 Idtype3                string  `gorm:" column:idtype3;type:varchar(200); null"`
 	 Idnumber3              string  `gorm:" column:idnumber3;type:varchar(200); null"`
-	 Idvalidto3             string  `gorm:" column:idvalidto3;type:varchar(256); null"`
+	 Idvalidto3             int64   `gorm:" column:idvalidto3;type:timestamp without time zone; null"`
 	 Mobileph3              string  `gorm:" column:mobileph3;type:varchar(200); null"`
 	 Gender3                string  `gorm:" column:gender3;type:varchar(200); null"`
 	 Npwp3                  string  `gorm:" column:npwp3;type:varchar(200); null"`
@@ -195,7 +195,7 @@ import "gorm.io/gorm"
 	 Address4               string  `gorm:" column:address4;type:varchar(200); null"`
 	 Idtype4                string  `gorm:" column:idtype4;type:varchar(200); null"`
 	 Idnumber4              string  `gorm:" column:idnumber4;type:varchar(200); null"`
-	 Idvalidto4             string  `gorm:" column:idvalidto4;type:varchar(256); null"`
+	 Idvalidto4             int64   `gorm:" column:idvalidto4;type:timestamp without time zone; null"`
 	 Mobileph4              string  `gorm:" column:mobileph4;type:varchar(200); null"`
 	 Gender4                string  `gorm:" column:gender4;type:varchar(200); null"`
 	 Npwp4                  string  `gorm:" column:npwp4;type:varchar(200); null"`
@@ -213,7 +213,7 @@ import "gorm.io/gorm"
 	 Addresso1              string  `gorm:" column:addresso1;type:varchar(200); null"`
 	 Idtypeo1               string  `gorm:" column:idtypeo1;type:varchar(200); null"`
 	 Idnumbero1             string  `gorm:" column:idnumbero1;type:varchar(200); null"`
-	 Idvalidtoo1            string  `gorm:" column:idvalidtoo1;type:varchar(256); null"`
+	 Idvalidtoo1            int64   `gorm:" column:idvalidtoo1;type:timestamp without time zone; null"`
 	 Mobilepho1             string  `gorm:" column:mobilepho1;type:varchar(200); null"`
 	 SharePercentageo1      string  `gorm:" column:sharePercentageo1;type:decimal(18, 0); null"` //Decimal
 	 Gendero1               string  `gorm:" column:gendero1;type:varchar(200); null"`
@@ -226,7 +226,7 @@ import "gorm.io/gorm"
 	 Addresso2              string  `gorm:" column:addresso2;type:varchar(200); null"`
 	 Idtypeo2               string  `gorm:" column:idtypeo2;type:varchar(200); null"`
 	 Idnumbero2             string  `gorm:" column:idnumbero2;type:varchar(200); null"`
-	 Idvalidtoo2            string  `gorm:" column:idvalidtoo2;type:varchar(256); null"`
+	 Idvalidtoo2            int64   `gorm:" column:idvalidtoo2;type:timestamp without time zone; null"`
 	 Mobilepho2             string  `gorm:" column:mobilepho2;type:varchar(200); null"`
 	 SharePercentageo2      string  `gorm:" column:sharePercentageo2;type:decimal(18, 0); null"` //Decimal
 	 Gendero2               string  `gorm:" column:gendero2;type:varchar(200); null"`
@@ -239,7 +239,7 @@ import "gorm.io/gorm"
 	 Addresso3              string  `gorm:" column:addresso3;type:varchar(200); null"`
 	 Idtypeo3               string  `gorm:" column:idtypeo3;type:varchar(200); null"`
 	 Idnumbero3             string  `gorm:" column:idnumbero3;type:varchar(200); null"`
-	 Idvalidtoo3            string  `gorm:" column:idvalidtoo3;type:varchar(256); null"`
+	 Idvalidtoo3            int64   `gorm:" column:idvalidtoo3;type:timestamp without time zone; null"`
 	 Mobilepho3             string  `gorm:" column:mobilepho3;type:varchar(200); null"`
 	 SharePercentageo3      string  `gorm:" column:sharePercentageo3;type:decimal(18, 0); null"` //Decimal
 	 Gendero3               string  `gorm:" column:gendero3;type:varchar(200); null"`
@@ -252,7 +252,7 @@ import "gorm.io/gorm"
 	 Addresso4              string  `gorm:" column:addresso4;type:varchar(200); null"`
 	 Idtypeo4               string  `gorm:" column:idtypeo4;type:varchar(200); null"`
 	 Idnumbero4             string  `gorm:" column:idnumbero4;type:varchar(200); null"`
-	 Idvalidtoo4            string  `gorm:" column:idvalidtoo4;type:varchar(256); null"`
+	 Idvalidtoo4            int64   `gorm:" column:idvalidtoo4;type:timestamp without time zone; null"`
 	 Mobilepho4             string  `gorm:" column:mobilepho4;type:varchar(200); null"`
 	 SharePercentageo4      string  `gorm:" column:sharePercentageo4;type:decimal(18, 0); null"` //Decimal
 	 Gendero4               string  `gorm:" column:gendero4;type:varchar(200); null"`
@@ -265,11 +265,11 @@ import "gorm.io/gorm"
 	 Postcode3Corp          string  `gorm:" column:postcode3Corp;type:varchar(200); null"`
 	 TypeBoard              string  `gorm:" column:typeBoard;type:varchar(200); null"`
 	 Customer_risk          string  `gorm:" column:customer_risk;type:varchar(200); null"`
-	 Eformdate              string  `gorm:" column:eformdate;type:varchar(256); null"`
+	 Eformdate              int64   `gorm:" column:eformdate;type:timestamp without time zone; null"`
 	 AppCode                string  `gorm:" column:AppCode;type:varchar(200); null"`
 	 VirtualAcc             string  `gorm:" column:VirtualAcc;type:varchar(200); null"`
 	 VirtualAccName         string  `gorm:" column:VirtualAccName;type:varchar(200); null"`
-	 TransferDate           string  `gorm:" column:TransferDate;type:varchar(256); null"`
+	 TransferDate           int64   `gorm:" column:TransferDate;type:timestamp without time zone; null"`
 	 HubHukum               string  `gorm:" column:HubHukum;type:varchar(200); null"`
 	 HukumLain              string  `gorm:" column:HukumLain;type:varchar(200); null"`
 	 OfficePillar           string  `gorm:" column:OfficePillar;type:varchar(200); null"`
@@ -416,5 +416,5 @@ import "gorm.io/gorm"
 	 FirstEstablishCode     string  `gorm:" column:FirstEstablishCode;type:varchar(200); null"`
 	 FlagBenefOwn           string  `gorm:" column:FlagBenefOwn;type:varchar(10); null"`
 	 NasabahPrioritas       string  `gorm:" column:nasabahPrioritas;type:varchar(20); null"`
-	 FirstEstablishDate     string  `gorm:" column:FirstEstablishDate;type:varchar(256); null"`
+	 FirstEstablishDate     int64   `gorm:" column:FirstEstablishDate;type:timestamp without time zone; null"`
  }

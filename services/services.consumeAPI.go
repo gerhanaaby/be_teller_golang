@@ -1,3 +1,10 @@
+/**
+ * @author [Fajar Dwi Nur Racmadi]
+ * @email [fajar.d.rachmadi@banksinarmas.com]
+ * @create date 2023-02-16
+ * @modify date 2023-02-20
+ * @desc [Fungsi consume api]
+ */
 package services
 
 import (
@@ -9,13 +16,6 @@ import (
 	"time"
 )
 
-/**
- * @author [Fajar Dwi Nur Racmadi]
- * @email [fajar.d.rachmadi@banksinarmas.com]
- * @create date 2023-02-16
- * @modify date 2023-02-20
- * @desc [Fungsi consume api]
- */
 func ConsumeAPIService(name string, model []byte) ([]byte, error) {
 	req, err := http.NewRequest(http.MethodPost, models.ApiMap[name].Url, bytes.NewBuffer(model))
 	if err != nil {
