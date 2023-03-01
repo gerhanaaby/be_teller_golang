@@ -18,19 +18,19 @@ type User struct {
 	gorm.Model
 
 	ID     			 int64     `json:"userid" gorm:"type:serial;primary_key"`
-	Name             string    `gorm:"type:varchar(255);not null"`
-	Username 		 string    `gorm:"uniqueIndex;not null"`
-	Email            string    `gorm:"uniqueIndex;not null"`
-	Password         string    `gorm:"not null"`
-	Nik				 string    `gorm:"type:varchar(255);not null"`
-	BranchCode		 string    `gorm:"type:varchar(255);not null"`
-	Roles            string    `gorm:"type:varchar(255);not null"`
-	Division         string    `gorm:"type:varchar(255);not null"`
-	Photo            string    `gorm:"not null"`
-	VerificationCode string	   `gorm:"not null"`
-	Verified         bool      `gorm:"not null"`
-	CreatedAt        time.Time `gorm:"not null"`
-	UpdatedAt        time.Time `gorm:"not null"`
+	Name             string    `json:"name" gorm:"type:varchar(255);not null"`
+	Username 		 string    `json:"username" gorm:"uniqueIndex;not null"`
+	Email            string    `json:"email" gorm:"uniqueIndex;not null"`
+	Password         string    `json:"password" gorm:"not null"`
+	Nik				 string    `json:"nik" gorm:"type:varchar(255); uniqueIndex;not null"`
+	BranchCode		 string    `json:"branch_code" gorm:"type:varchar(255);not null"`
+	Roles            string    `json:"role" gorm:"type:varchar(255);not null"`
+	Division         string    `json:"div" gorm:"type:varchar(255);not null"`
+	Photo            string    `json:"photo" gorm:"not null"`
+	VerificationCode string	   `json:"verify_code" gorm:"not null"`
+	Verified         bool      `json:"verified" gorm:"not null"`
+	CreatedAt        time.Time `json:"created_at" gorm:"not null"`
+	UpdatedAt        time.Time `json:"updated_at" gorm:"not null"`
 }
 
 type SignUpInput struct {

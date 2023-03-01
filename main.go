@@ -70,6 +70,18 @@ func init() {
 		panic(err)
 	}
 
+	// services.RedClient = redis.NewClient(&redis.Options{
+    //     Addr: "localhost:6379",
+    //     Password: "simaS123",
+    //     DB: 0,
+    // })
+
+    // pong, err := services.RedClient.Ping().Result()
+	// if err != nil {
+	// 	panic(err)
+	// }
+    // fmt.Println(pong)
+
 }
 
 func main() {

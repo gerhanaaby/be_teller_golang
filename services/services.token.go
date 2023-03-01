@@ -1,3 +1,11 @@
+/**
+ * @author [Fajar Dwi Nur Racmadi]
+ * @email [fajar.d.rachmadi@banksinarmas.com]
+ * @create date 2023-02-14
+ * @modify date 2023-02-20
+ * @desc [Cek Keabsahan token pada jwt session]
+ */
+
 package services
 
 import (
@@ -10,13 +18,6 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-/**
- * @author [Fajar Dwi Nur Racmadi]
- * @email [fajar.d.rachmadi@banksinarmas.com]
- * @create date 2023-02-14
- * @modify date 2023-02-20
- * @desc [Cek Keabsahan token pada jwt session]
- */
  type Claims struct {
 	User	models.User `josn:"User"`
 	jwt.RegisteredClaims

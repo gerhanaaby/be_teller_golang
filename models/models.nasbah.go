@@ -418,3 +418,7 @@ import "gorm.io/gorm"
 	 NasabahPrioritas       string  `gorm:" column:nasabahPrioritas;type:varchar(20); null"`
 	 FirstEstablishDate     string  `gorm:" column:FirstEstablishDate;type:varchar(256); null"`
  }
+
+ func (*Nasabah) TableName() string {
+	return "nasabahs"
+}
