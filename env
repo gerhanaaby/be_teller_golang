@@ -1,9 +1,9 @@
 # Postgresql 13 server 82
 POSTGRES_HOST = localhost
 POSTGRES_USER = golangdev
-POSTGRES_PASSWORD = simaS123
+POSTGRES_PASSWORD = katasandi12
 POSTGRES_DB = teller
-POSTGRES_PORT = 6543
+POSTGRES_PORT = 5433
 
 PORT=8000
 CLIENT_ORIGIN=http://localhost:5000
