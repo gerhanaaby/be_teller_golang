@@ -3,6 +3,7 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"teller/db"
@@ -12,109 +13,87 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 func PostAdvice(c *gin.Context) {
 	startTime := time.Now()
-	var reqApiTime int64 = 0
-	var isValid bool = false
-	var err error
 
-	//--> TOKEN VALIDATION REQUEST
-	_,isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
-	if err != nil {
+	if ReqTime, Response, err := TransactAdvice(c); err != nil {
 		services.WriteLog(
-			"[advice-fail]", 
+			"[fail][advice]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
-				reqApiTime,
+				time.Since(startTime).Milliseconds()-ReqTime,
+				ReqTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
-		c.AbortWithError(http.StatusBadRequest, err)
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
+
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status:  "Fail",
-			Message: "unable to precess due" + err.Error(),
+			Message: "error, " + err.Error(),
 		})
-		return
+
+	} else {
+		services.WriteLog(
+			"[done][advice]",
+			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				time.Since(startTime).Milliseconds()-ReqTime,
+				ReqTime,
+				time.Since(startTime).Milliseconds()),
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
+		c.JSON(http.StatusCreated, Response)
+	}
+}
+
+func TransactAdvice(c *gin.Context) (reqApiTime int64, dataResponse map[string]interface{}, err error) {
+	var isValid bool = false
+	var claims jwt.MapClaims
+
+	//--> TOKEN VALIDATION REQUEST
+	claims, isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
+	if err != nil {
+		return 0, nil, err
 	}
 
 	if !isValid {
-		services.WriteLog(
-			"[advice-fail]", 
-			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
-				reqApiTime,
-				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
-		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status:  "Fail",
-			Message: "unable to precess due invalid login or expired",
-		})
-		return
+		return 0, nil, errors.New("error, authentication failure")
+	}
+
+	// Convert map to json string
+	jsonStr, err := json.Marshal(claims["User"])
+	if err != nil {
+		return 0, nil, err
+	}
+
+	user := models.User{}
+	// Convert json string to struct
+	if err := json.Unmarshal(jsonStr, &user); err != nil {
+		return 0, nil, err
 	}
 
 	//--> API REQUEST PROCESS
 	request := models.Advice{}
-
 	if err = c.ShouldBindJSON(&request); err != nil {
-		services.WriteLog(
-			"[advice-fail]", 
-			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
-				reqApiTime,
-				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
-		c.AbortWithError(http.StatusBadRequest, err)
-		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status:  "Fail",
-			Message: "unable to precess due" + err.Error(),
-		})
-		return
+		return 0, nil, err
+	}
+
+	request.ReferenceId, err = services.GenTransactID("", user.Nik)
+	if err != nil {
+		return 0, nil, err
 	}
 
 	err = db.GetDB().Create(&request).Error
 	if err != nil {
-		services.WriteLog(
-			"[advice-fail]", 
-			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
-				reqApiTime,
-				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
-		c.AbortWithError(http.StatusInternalServerError, err)
-		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status:  "Fail",
-			Message: "unable to precess due" + err.Error(),
-		})
-		return
+		return 0, nil, err
 	}
 
-	reqApiTime, dataResponse, err := PostToAPIAdvice(request)
+	reqApiTime, dataResponse, err = PostToAPIAdvice(request)
 	if err != nil {
-		services.WriteLog(
-			"[advice-fail]", 
-			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-reqApiTime, 
-				reqApiTime,
-				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
-		c.AbortWithError(http.StatusInternalServerError, err)
-		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status:  "Fail",
-			Message: "unable to precess due" + err.Error(),
-		})
-		return
-
+		return 0, nil, err
 	}
 
-	services.WriteLog(
-		"[advice-done]", 
-		fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-			time.Since(startTime).Milliseconds()-reqApiTime, 
-			reqApiTime,
-			time.Since(startTime).Milliseconds()),
-		inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
-	c.JSON(http.StatusCreated, dataResponse)
+	return reqApiTime, dataResponse, nil
+
 }
 
 func PostToAPIAdvice(dataAdvice models.Advice) (int64, map[string]interface{}, error) {
@@ -151,8 +130,8 @@ func PostToAPIAdvice(dataAdvice models.Advice) (int64, map[string]interface{}, e
 		return 0, nil, err
 	}
 	services.WriteLog(
-		"[advice-report]", 
+		"[skn-report]",
 		dst.String(),
-		inits.Cfg.LogReportPath+services.LogFileName,"report")
-	return time.Since(start).Milliseconds(),dataResponse, nil
+		inits.Cfg.LogReportPath+services.LogFileName, "report")
+	return time.Since(start).Milliseconds(), dataResponse, nil
 }
