@@ -28,7 +28,7 @@ func Login(user models.SignInInput) (string, error) {
 	}
 
 	if result.Name == `` {
-		return ``, errors.New("user")
+		return ``, errors.New("error, invalid user")
 
 	}
 
