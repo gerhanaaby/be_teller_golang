@@ -67,5 +67,4 @@ func GetNasabahByCIF(c *gin.Context){
 	}
 
 	c.JSON(http.StatusOK, newResult)
-	return
 }
