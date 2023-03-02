@@ -10,7 +10,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 	"teller/inits"
 	"teller/models"
@@ -37,9 +36,9 @@ func CheckToken(reqToken string) (claims jwt.MapClaims, isValid bool, err error)
 	if err != nil {
 		return nil, false, err
 	}
-	_,a := token.Claims.(jwt.MapClaims)
-	if !a {
-		fmt.Println()
+	_,valid := token.Claims.(jwt.MapClaims)
+	if !valid {
+		return nil, false, errors.New("invalid JWT Token")
 	}
 
 	if claims, ok  := token.Claims.(jwt.MapClaims); ok && token.Valid {

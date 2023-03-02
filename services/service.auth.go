@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	"teller/db"
 	"teller/inits"
 	"teller/models"
@@ -30,14 +29,11 @@ func Login(user models.SignInInput) (string, error) {
 		return ``, err
 	}
 
-
 	// isMatch := CheckPasswordHash(result.Password, password)
 	// if !isMatch {
 	// 	return ``, errors.New("error, not match encrypt")
 	// }
-	
-	fmt.Println(result)
-	
+		
 	if result.Name == `` {
 		return ``, errors.New("error, invalid user")
 
