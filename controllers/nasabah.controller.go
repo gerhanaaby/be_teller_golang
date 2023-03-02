@@ -10,17 +10,17 @@ package controllers
 import (
 	"net/http"
 	"teller/db"
-	"teller/models"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetNasabahByCIF(c *gin.Context){
 
-	result := models.Nasabah{}
 
 	cif := c.Param("cif")
-	if cif == "" {
+
+
+	if len(cif) < 1 {
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status: "Fail", 
 			Message: "error, empty CIF",
@@ -28,7 +28,28 @@ func GetNasabahByCIF(c *gin.Context){
 		return
 	}
 
-	err := db.GetDB().Where(`"CIF" = ? `, cif).Find(&result).Error
+	var newResult map[string]interface{}
+
+	err := db.GetDB().Table("nasabahs").Select(
+	`"CIF"`,
+	`"mnemonics"`,
+	`"kseisid"`,	
+	`"Nama"`,
+	`"birthPlace"`,
+	`"TanggalLahir"`,
+	`"documentFlag"`,
+	`"gender"`,
+	`"titleBeforeName"`,
+	`"titleAfterName"`,
+	`"religion"`,
+	`"resident"`,
+	`"nationality"`,
+	`"Createdby"`,
+	`"CreationDate"`,
+	`"lastchange"`,
+	`"supervisorId"`,
+	`"custStatus"`,
+	).Where(`"CIF" = ? `, cif).Find(&newResult).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status: "Fail", 
@@ -37,7 +58,7 @@ func GetNasabahByCIF(c *gin.Context){
 		return
 	}
 
-	if result.CIF == `` {
+	if len(newResult) == 0 {
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status: "Fail", 
 			Message: "invalid, nasabah not found",
@@ -45,5 +66,5 @@ func GetNasabahByCIF(c *gin.Context){
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, newResult)
 }

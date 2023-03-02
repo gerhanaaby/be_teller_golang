@@ -23,9 +23,17 @@ func Login(user models.SignInInput) (string, error) {
 	password := user.Password
 
 	err := db.GetDB().Where("username = ? AND password = ? AND verified = true", username, password).Find(&result).Error
+
+	// err := db.GetDB().Where("username = ? AND verified = true", username).Find(&result).Error
 	if err != nil {
 		return ``, err
 	}
+
+
+	// isMatch := CheckPasswordHash(result.Password, password)
+	// if !isMatch {
+	// 	return ``, errors.New("error, not match encrypt")
+	// }
 
 	if result.Name == `` {
 		return ``, errors.New("error, invalid user")

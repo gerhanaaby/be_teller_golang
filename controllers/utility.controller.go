@@ -27,7 +27,7 @@ func GetBase64ByCif(c *gin.Context) {
 	// cif, exist := c.GetQuery("cif")
 
 	cif := c.Param("cif")
-	if cif == "" {
+	if len(cif) < 1 {
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status: "Fail", 
 			Message: "error, empty CIF",
@@ -39,7 +39,10 @@ func GetBase64ByCif(c *gin.Context) {
 				Message: "error, "+err.Error(),
 			})
 		} else {
-			c.JSON(http.StatusOK, content)
+			c.JSON(http.StatusOK, AuthStatus{
+				Status: "Success", 
+				Message: string(content),
+		})
 		}	
 	}
 }

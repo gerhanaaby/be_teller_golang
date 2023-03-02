@@ -21,35 +21,34 @@ func SKN(c *gin.Context) {
 
 	if ReqTime, Response, err := TransactSKN(c); err != nil {
 		services.WriteLog(
-			"[fail][skn]", 
+			"[fail][skn]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-ReqTime, 
+				time.Since(startTime).Milliseconds()-ReqTime,
 				ReqTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
-			
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
+
 		c.JSON(http.StatusBadRequest, AuthStatus{
-			Status: "Fail", 
-			Message: "error, "+err.Error(),
+			Status:  "Fail",
+			Message: "error, " + err.Error(),
 		})
 
 	} else {
 		services.WriteLog(
-			"[done][skn]", 
+			"[done][skn]",
 			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-ReqTime, 
+				time.Since(startTime).Milliseconds()-ReqTime,
 				ReqTime,
 				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName,"performance")
+			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.JSON(http.StatusCreated, Response)
 	}
 }
 
-
-func TransactSKN(c *gin.Context) (reqApiTime int64,  dataResponse map[string]interface{}, err error) {
+func TransactSKN(c *gin.Context) (reqApiTime int64, dataResponse map[string]interface{}, err error) {
 	var isValid bool = false
 	var claims jwt.MapClaims
-	
+
 	//--> TOKEN VALIDATION REQUEST
 	claims, isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
@@ -61,25 +60,24 @@ func TransactSKN(c *gin.Context) (reqApiTime int64,  dataResponse map[string]int
 	}
 
 	// Convert map to json string
-    jsonStr, err := json.Marshal(claims["User"])
-    if err != nil {
-        return 0, nil, err
-    }
+	jsonStr, err := json.Marshal(claims["User"])
+	if err != nil {
+		return 0, nil, err
+	}
 
 	user := models.User{}
-    // Convert json string to struct
-    if err := json.Unmarshal(jsonStr, &user); err != nil {
-        return 0, nil, err
-    }
-
+	// Convert json string to struct
+	if err := json.Unmarshal(jsonStr, &user); err != nil {
+		return 0, nil, err
+	}
 
 	//--> API REQUEST PROCESS
 	request := models.Skn{}
 	if err = c.ShouldBindJSON(&request); err != nil {
 		return 0, nil, err
 	}
-	
-	request.ReferenceId, err = services.GenTransactID("MDLN-",user.Nik) 
+
+	request.ReferenceId, err = services.GenTransactID("MDLN-", user.Nik)
 	if err != nil {
 		return 0, nil, err
 	}
@@ -89,7 +87,7 @@ func TransactSKN(c *gin.Context) (reqApiTime int64,  dataResponse map[string]int
 		return 0, nil, err
 	}
 
-	reqApiTime, dataResponse , err = PostToAPIdev(request)
+	reqApiTime, dataResponse, err = PostToAPIdev(request)
 	if err != nil {
 		return 0, nil, err
 	}
@@ -97,7 +95,6 @@ func TransactSKN(c *gin.Context) (reqApiTime int64,  dataResponse map[string]int
 	return reqApiTime, dataResponse, nil
 
 }
-
 
 func PostToAPIdev(dataSKN models.Skn) (int64, map[string]interface{}, error) {
 	start := time.Now()
@@ -145,8 +142,8 @@ func PostToAPIdev(dataSKN models.Skn) (int64, map[string]interface{}, error) {
 		return 0, nil, err
 	}
 	services.WriteLog(
-		"[skn-report]", 
+		"[skn-report]",
 		dst.String(),
-		inits.Cfg.LogReportPath+services.LogFileName,"report")
-	return time.Since(start).Milliseconds(),dataResponse, nil
+		inits.Cfg.LogReportPath+services.LogFileName, "report")
+	return time.Since(start).Milliseconds(), dataResponse, nil
 }
