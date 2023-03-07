@@ -1,7 +1,6 @@
 package inits
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/caarlos0/env/v6"
@@ -46,13 +45,11 @@ type Config struct {
 func LoadConfig(path string) (err error) {
 
 	if err := godotenv.Load(path); err != nil {
-		fmt.Println(err)
 		return err
 	}
 
 	err = env.Parse(&Cfg)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 

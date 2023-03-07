@@ -19,15 +19,15 @@ import (
 func PostInternalTransfer(c *gin.Context) {
 	startTime := time.Now()
 
-	if ReqTime, Response, err := TransactInternalTransfer(c); err != nil {
+	if RefID, ReqTime, Response, err := TransactInternalTransfer(c); err != nil {
 		services.WriteLog(
 			"[fail][internal-transfer]",
-			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
-				time.Since(startTime).Milliseconds()-ReqTime,
-				ReqTime,
-				time.Since(startTime).Milliseconds()),
-			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
-
+			fmt.Sprintf("REF-ID: %s, Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+			RefID,
+			time.Since(startTime).Milliseconds()-ReqTime,
+			ReqTime,
+			time.Since(startTime).Milliseconds()),
+		inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status:  "Fail",
 			Message: "error, " + err.Error(),
@@ -36,7 +36,8 @@ func PostInternalTransfer(c *gin.Context) {
 	} else {
 		services.WriteLog(
 			"[done][internal-transfer]",
-			fmt.Sprintf("Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+			fmt.Sprintf("REF-ID: %s, Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
+				RefID,
 				time.Since(startTime).Milliseconds()-ReqTime,
 				ReqTime,
 				time.Since(startTime).Milliseconds()),
@@ -45,54 +46,54 @@ func PostInternalTransfer(c *gin.Context) {
 	}
 }
 
-func TransactInternalTransfer(c *gin.Context) (reqApiTime int64, dataResponse map[string]interface{}, err error) {
+func TransactInternalTransfer(c *gin.Context) (RefID string, reqApiTime int64, dataResponse map[string]interface{}, err error) {
 	var isValid bool = false
 	var claims jwt.MapClaims
 
 	//--> TOKEN VALIDATION REQUEST
 	claims, isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
-		return 0, nil, err
+		return `NOID`, 0, nil, err
 	}
 
 	if !isValid {
-		return 0, nil, errors.New("error, authentication failure")
+		return `NOID`, 0, nil, errors.New("error, authentication failure")
 	}
 
 	// Convert map to json string
 	jsonStr, err := json.Marshal(claims["User"])
 	if err != nil {
-		return 0, nil, err
+		return `NOID`, 0, nil, err
 	}
 
 	user := models.User{}
 	// Convert json string to struct
 	if err := json.Unmarshal(jsonStr, &user); err != nil {
-		return 0, nil, err
+		return `NOID`, 0, nil, err
 	}
 
 	//--> API REQUEST PROCESS
 	request := models.InternalTransfer{}
 	if err = c.ShouldBindJSON(&request); err != nil {
-		return 0, nil, err
+		return `NOID`, 0, nil, err
 	}
 
 	request.ReferenceId, err = services.GenTransactID("MDLN-", user.Nik)
 	if err != nil {
-		return 0, nil, err
+		return `NOID`, 0, nil, err
 	}
 
 	err = db.GetDB().Create(&request).Error
 	if err != nil {
-		return 0, nil, err
+		return request.ReferenceId, 0, nil, err
 	}
 
 	reqApiTime, dataResponse, err = PostToAPIInternal(request)
 	if err != nil {
-		return 0, nil, err
+		return request.ReferenceId, 0, nil, err
 	}
 
-	return reqApiTime, dataResponse, nil
+	return request.ReferenceId, reqApiTime, dataResponse, nil
 
 }
 
@@ -133,7 +134,7 @@ func PostToAPIInternal(dataInternal models.InternalTransfer) (int64, map[string]
 	}
 	services.WriteLog(
 		"[internaltransfer-report]",
-		dst.String(),
+		"["+dataInternal.ReferenceId+"]"+dst.String(),
 		inits.Cfg.LogReportPath+services.LogFileName, "report")
 	return time.Since(start).Milliseconds(), dataResponse, nil
 }

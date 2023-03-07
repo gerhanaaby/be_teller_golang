@@ -9,7 +9,6 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"teller/db"
 	"teller/models"
@@ -128,8 +127,6 @@ func CreateUser(c *gin.Context) {
 		})
 		return
 	}
-
-	fmt.Println(request)
 
 	c.JSON(http.StatusOK, AuthStatus{
 		Status:  "Success",

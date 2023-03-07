@@ -1,0 +1,7 @@
+cd /usr
+
+mkdir nodejs
+
+cd /installer
+
+tar xvfJ node-v18.14.2-linux-x64.tar.xz nodejs/

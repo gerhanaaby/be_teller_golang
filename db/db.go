@@ -42,8 +42,6 @@ func ConnectDB() error {
 	if err = db.Table(`apis`).Scan(&models.ApiList).Error; err != nil  {
 		return err
 	}
-	fmt.Println(models.ApiList[0].Name)
-	fmt.Println(models.ApiList[1].Name)
 
 	for _, api := range models.ApiList{
 		models.ApiMap[api.Name] = api
