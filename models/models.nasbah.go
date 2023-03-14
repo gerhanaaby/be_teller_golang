@@ -419,6 +419,14 @@ import "gorm.io/gorm"
 	 FirstEstablishDate     string  `gorm:" column:FirstEstablishDate;type:varchar(256); null"`
  }
 
- func (*Nasabah) TableName() string {
+func (*Nasabah) TableName() string {
 	return "nasabahs"
+}
+
+func (n *Nasabah) CheckNsb() {
+	n.CheckNsbNama()
+}
+
+func (n *Nasabah) CheckNsbNama() {
+
 }

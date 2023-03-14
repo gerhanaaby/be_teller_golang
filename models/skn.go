@@ -5,7 +5,9 @@ import "gorm.io/gorm"
 type Skn struct {
 	gorm.Model
 
-	ID                        uint   `json:"id"`
+	// ID                        uint   `json:"id"`
+
+	CaseID 					  string `json:"caseID" gorm:"type:varchar(50);default:'SKN-'||TO_CHAR(NOW()::date, 'yyyymmdd')||to_char(nextval('skn_tix_seq'::regclass), 'FM0000000000')"`
 	CreditAccountNo           string `json:"creditAccountNo" gorm:"type:varchar(50)"`
 	Amount                    string `json:"amount" gorm:"type:varchar(250)"`
 	BeneficiaryResidentStatus string `json:"beneficiaryResidentStatus" gorm:"type:varchar(5)"`
@@ -14,7 +16,7 @@ type Skn struct {
 	TransactionDate           string `json:"transactionDate" gorm:"type:varchar(20)"`
 	TransactionTime           string `json:"transactionTime" gorm:"type:varchar(20)"`
 	ClearingTransactionCode   string `json:"clearingTransactionCode" gorm:"type:varchar(10)"`
-	ReferenceId               string `json:"referenceId" gorm:"type:varchar(250)"`
+	ReferenceId               string `json:"referenceId" gorm:"type:varchar(250);uniqueIndex"`
 	PaymentDetails1           string `json:"paymentDetails1" gorm:"type:varchar(250)"`
 	SenderName                string `json:"senderName" gorm:"type:varchar(250)"`
 	PaymentDetails2           string `json:"paymentDetails2" gorm:"type:varchar(250)"`

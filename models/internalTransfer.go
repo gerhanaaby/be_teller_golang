@@ -5,8 +5,10 @@ import "gorm.io/gorm"
 type InternalTransfer struct {
 	gorm.Model
 
-	ID               uint   `json:"id"`
-	ReferenceId      string `json:"referenceId" gorm:"type:varchar(200)"`
+	// ID               uint   `json:"id"`
+	CaseID 			 string `json:"caseID" gorm:"type:varchar(50);default:'ITF-'||TO_CHAR(NOW()::date, 'yyyymmdd')||to_char(nextval('itf_tix_seq'::regclass), 'FM0000000000')"`
+	ReferenceId      string `json:"referenceId" gorm:"type:varchar(250);uniqueIndex"`
+	// ReferenceId      string `json:"referenceId" gorm:"type:varchar(250)"`
 	DebitAccountNo   string `json:"debitAccountNo" gorm:"type:varchar(200)"`
 	CreditAccountNo  string `json:"creditAccountNo" gorm:"type:varchar(200)"`
 	CreditAmount     string `json:"creditAmount" goarm:"type:varchar(250)"`

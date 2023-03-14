@@ -5,7 +5,7 @@ import "gorm.io/gorm"
 type Advice struct {
 	gorm.Model
 
-	ID                  uint   `json:"id"`
+	// ID                  uint   `json:"id"`
 	ReferenceId         string `json:"referenceId" gorm:"type:varchar(200)"`
 	DebitAccountNo      string `json:"debitAccountNo" gorm:"type:varchar(200)"`
 	CreditAccountNo     string `json:"creditAccountNo" gorm:"type:varchar(200)"`

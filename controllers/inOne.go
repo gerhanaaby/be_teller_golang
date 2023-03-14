@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"teller/db"
 	"teller/inits"
 	"teller/models"
@@ -16,20 +17,18 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func SKN(c *gin.Context) {
+func PostGetDetail2(c *gin.Context) {
 	startTime := time.Now()
 
-	
-	if RefID, ReqTime, Response, err := TransactSKN(c); err != nil {
+	if RefID, ReqTime, Response, err := TransactGetDetail2(c); err != nil {
 		services.WriteLog(
-			"[fail][skn]",
+			"[fail][getdetail]",
 			fmt.Sprintf("REF-ID: %s, Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
 				RefID,
 				time.Since(startTime).Milliseconds()-ReqTime,
 				ReqTime,
 				time.Since(startTime).Milliseconds()),
 			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
-
 		c.JSON(http.StatusBadRequest, AuthStatus{
 			Status:  "Fail",
 			Message: "error, " + err.Error(),
@@ -37,21 +36,23 @@ func SKN(c *gin.Context) {
 
 	} else {
 		services.WriteLog(
-			"[done][skn]",
+			"[done][getdetail]",
 			fmt.Sprintf("REF-ID: %s, Go-Time: %dms, Api-Time: %dms, Total-TIme: %dms",
 				RefID,
 				time.Since(startTime).Milliseconds()-ReqTime,
 				ReqTime,
 				time.Since(startTime).Milliseconds()),
 			inits.Cfg.LogPerformancePath+services.LogFileName, "performance")
+
 		c.JSON(http.StatusCreated, Response)
 	}
 }
 
-func TransactSKN(c *gin.Context) (refid string, reqApiTime int64, dataResponse map[string]interface{}, err error) {
+func TransactGetDetail2(c *gin.Context) (RefID string, reqApiTime int64, dataResponse map[string]interface{}, err error) {
 	var isValid bool = false
 	var claims jwt.MapClaims
 
+	//
 	//--> TOKEN VALIDATION REQUEST
 	claims, isValid, err = services.CheckToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
@@ -71,58 +72,82 @@ func TransactSKN(c *gin.Context) (refid string, reqApiTime int64, dataResponse m
 	user := models.User{}
 	// Convert json string to struct
 	if err := json.Unmarshal(jsonStr, &user); err != nil {
-		return `NOID`,0, nil, err
+		return `NOID`, 0, nil, err
 	}
+	//
 
 	//--> API REQUEST PROCESS
-	request := models.Skn{}
+	request := models.GetDetail{}
 	if err = c.ShouldBindJSON(&request); err != nil {
 		return `NOID`, 0, nil, err
 	}
 
-	request.ReferenceId, err = services.GenTransactID("MDLN-", user.Nik)
+	TransacIDPrefix := "MDLN-"
+
+	request.TransactionID, err = services.GenTransactID(TransacIDPrefix, user.Nik)
 	if err != nil {
 		return `NOID`, 0, nil, err
 	}
 
-	err = db.GetDB().Updates(request).Where(request.CaseID).Error
-	// .Create(&request).Error
+	err = db.GetDB().Create(&request).Error
 	if err != nil {
-		return request.ReferenceId, 0, nil, err
+		return request.TransactionID, 0, nil, err
 	}
 
+	//hit API getDetail
 
-	reqApiTime, dataResponse, err = PostToAPIdev(request)
+	reqApiTime, dataResponse, err = PostToAPIGetDetail2(request)
 	if err != nil {
-		return request.ReferenceId, 0, nil, err
+		return request.TransactionID, 0, nil, err
 	}
 
-	return request.ReferenceId, reqApiTime, dataResponse, nil
+	if dataResponse[`responseMessage`] != "Transaction Successful" {
+		return request.TransactionID, 0, nil, err
+	}
+
+	switch request.TransactCategory {
+		case `SKN` :
+			skn := models.Skn{
+				ReferenceId: request.TransactionID,
+			}
+			err = db.GetDB().Create(&skn).Error
+			if err != nil {
+				return request.TransactionID, 0, nil, err
+			}
+			dataResponse[`caseID`] =  skn.CaseID
+		case `ITF` :
+			itf := models.InternalTransfer{
+				ReferenceId: request.TransactionID,
+			}
+			err = db.GetDB().Create(&itf).Error
+			if err != nil {
+				return request.TransactionID, 0, nil, err
+			}
+			dataResponse[`caseID`] =  itf.CaseID
+		default :
+		return `NOID`, 0, nil, errors.New(`error, invalid transaction category`)
+	}
+
+	dataResponse[`TransactionID`] = request.TransactionID	
+	// fakedata := make(map[string]interface{})
+	return request.TransactionID, reqApiTime, dataResponse,  nil
+
+	
+
+	// reqApiTime, dataResponse, err = PostToAPIGetDetail2(request)
+	// if err != nil {
+	// 	return strconv.Itoa(int(request.ID)), 0, nil, err
+	// }
+
+	// return strconv.Itoa(int(request.ID)), reqApiTime, dataResponse, nil
 
 }
 
-func PostToAPIdev(dataSKN models.Skn) (int64, map[string]interface{}, error) {
+func PostToAPIGetDetail2(dataGetDetail models.GetDetail) (int64, map[string]interface{}, error) {
 	start := time.Now()
 	data := map[string]interface{}{
-		"creditAccountNo":           dataSKN.CreditAccountNo,
-		"amount":                    dataSKN.Amount,
-		"beneficiaryResidentStatus": dataSKN.BeneficiaryResidentStatus,
-		"clearingCode":              dataSKN.ClearingCode,
-		"remark":                    dataSKN.Remark,
-		"transactionDate":           dataSKN.TransactionDate,
-		"transactionTime":           dataSKN.TransactionTime,
-		"clearingTransactionCode":   dataSKN.ClearingTransactionCode,
-		"referenceId":               dataSKN.ReferenceId,
-		"paymentDetails1":           dataSKN.PaymentDetails1,
-		"senderName":                dataSKN.SenderName,
-		"paymentDetails2":           dataSKN.PaymentDetails2,
-		"paymentDetails3":           dataSKN.PaymentDetails3,
-		"debitAccountNo":            dataSKN.DebitAccountNo,
-		"beneficiaryNationStatus":   dataSKN.BeneficiaryNationStatus,
-		"beneficiaryType":           dataSKN.BeneficiaryType,
-		"beneficiaryName":           dataSKN.BeneficiaryName,
-		"chargeAmount":              dataSKN.ChargeAmount,
-		"currency":                  dataSKN.Currency,
+		"transactionID": dataGetDetail.TransactionID,
+		"accountNumber": dataGetDetail.AccountNumber,
 	}
 
 	requestJson, err := json.Marshal(data)
@@ -130,7 +155,7 @@ func PostToAPIdev(dataSKN models.Skn) (int64, map[string]interface{}, error) {
 		return 0, nil, err
 	}
 
-	body, err := services.ConsumeAPIService("skn", requestJson)
+	body, err := services.ConsumeAPIService("getdetail", requestJson)
 	if err != nil {
 		return 0, nil, err
 	}
@@ -147,8 +172,8 @@ func PostToAPIdev(dataSKN models.Skn) (int64, map[string]interface{}, error) {
 		return 0, nil, err
 	}
 	services.WriteLog(
-		"[skn-report]",
-		"["+dataSKN.ReferenceId+"]"+dst.String(),
+		"[getdetail-report]",
+		"["+strconv.Itoa(int(dataGetDetail.ID))+"]"+dst.String(),
 		inits.Cfg.LogReportPath+services.LogFileName, "report")
 	return time.Since(start).Milliseconds(), dataResponse, nil
 }

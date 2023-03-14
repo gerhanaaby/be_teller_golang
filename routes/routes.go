@@ -34,7 +34,8 @@ func Routes() {
 			UserTransRoutes.POST("/postskn", controllers.SKN)                           ///user/transac/postskn
 			UserTransRoutes.POST("/postinquirytransfer", controllers.PostInquiryTransfer)   // inquiry transfer
 			UserTransRoutes.POST("/postinternaltransfer", controllers.PostInternalTransfer) // internal transfer
-			UserTransRoutes.POST("/postgetdetail", controllers.PostGetDetail)               // get detail
+			UserTransRoutes.POST("/postgetdetail", controllers.PostGetDetail2)               // get detail
+			// UserTransRoutes.POST("/postgetdetail2", controllers.PostGetDetail2)               // get detail
 			UserTransRoutes.POST("/postadvice", controllers.PostAdvice)                     // Advice
 		}
 
