@@ -85,17 +85,17 @@ func TransactSKN(c *gin.Context) (refid string, reqApiTime int64, dataResponse m
 		return `NOID`, 0, nil, err
 	}
 
-	err = db.GetDB().Updates(request).Where(request.CaseID).Error
-	// .Create(&request).Error
+	err = db.GetDB().Create(&request).Error
 	if err != nil {
 		return request.ReferenceId, 0, nil, err
 	}
-
 
 	reqApiTime, dataResponse, err = PostToAPIdev(request)
 	if err != nil {
 		return request.ReferenceId, 0, nil, err
 	}
+
+	dataResponse["caseID"] = request.CaseID
 
 	return request.ReferenceId, reqApiTime, dataResponse, nil
 

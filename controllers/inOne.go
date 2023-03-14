@@ -101,10 +101,6 @@ func TransactGetDetail2(c *gin.Context) (RefID string, reqApiTime int64, dataRes
 		return request.TransactionID, 0, nil, err
 	}
 
-	if dataResponse[`responseMessage`] != "Transaction Successful" {
-		return request.TransactionID, 0, nil, err
-	}
-
 	switch request.TransactCategory {
 		case `SKN` :
 			skn := models.Skn{
@@ -114,6 +110,11 @@ func TransactGetDetail2(c *gin.Context) (RefID string, reqApiTime int64, dataRes
 			if err != nil {
 				return request.TransactionID, 0, nil, err
 			}
+			
+			if dataResponse[`responseMessage`] != "Transaction Successful" {
+				return request.TransactionID, 0, nil, errors.New(`error, no data found`)
+			}
+
 			dataResponse[`caseID`] =  skn.CaseID
 		case `ITF` :
 			itf := models.InternalTransfer{
@@ -123,6 +124,11 @@ func TransactGetDetail2(c *gin.Context) (RefID string, reqApiTime int64, dataRes
 			if err != nil {
 				return request.TransactionID, 0, nil, err
 			}
+
+			if dataResponse[`responseMessage`] != "Transaction Successful" {
+				return request.TransactionID, 0, nil, errors.New(`error, no data found`)
+			}
+			
 			dataResponse[`caseID`] =  itf.CaseID
 		default :
 		return `NOID`, 0, nil, errors.New(`error, invalid transaction category`)

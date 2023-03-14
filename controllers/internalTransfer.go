@@ -78,8 +78,7 @@ func TransactInternalTransfer(c *gin.Context) (RefID string, reqApiTime int64, d
 		return `NOID`, 0, nil, err
 	}
 
-	// request.ReferenceId, err = services.GenTransactID("MDLN-", user.Nik)
-	err = db.GetDB().Updates(request).Where(request.CaseID).Error
+	request.ReferenceId, err = services.GenTransactID("MDLN-", user.Nik)
 	if err != nil {
 		return `NOID`, 0, nil, err
 	}
@@ -93,6 +92,8 @@ func TransactInternalTransfer(c *gin.Context) (RefID string, reqApiTime int64, d
 	if err != nil {
 		return request.ReferenceId, 0, nil, err
 	}
+
+	dataResponse["caseID"] = request.CaseID
 
 	return request.ReferenceId, reqApiTime, dataResponse, nil
 
